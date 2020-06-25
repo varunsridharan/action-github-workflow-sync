@@ -1,0 +1,31 @@
+name: 'Github Workflow Sync'
+description: 'Github Action To Sync Github Actions Workflow Files Across Repositories'
+author: 'varunsridharan'
+branding:
+  icon: 'upload-cloud'
+  color: 'blue'
+inputs:
+  REPOSITORIES:
+    description: 'Github Repos To Sync To'
+    default: ''
+    required: true
+  WORKFLOW_FILES:
+    description: 'Local Workflow Files To Sync'
+    default: ''
+    required: true
+  GITHUB_TOKEN:
+    description: "Token to use to get repos and write secrets"
+    required: true
+  DRY_RUN:
+    description: "Run everything except for nothing will be Updated."
+    required: false
+    default: 'false'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.REPOSITORIES }}
+    - ${{ inputs.WORKFLOW_FILES }}
+    - ${{ inputs.GITHUB_TOKEN }}
+    - ${{ inputs.DRY_RUN }}
