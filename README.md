@@ -56,7 +56,7 @@ WORKFLOW_FILES: |
 ## 🚀 Usage
 
 ### Step 1
-Create a [New Repository](https://github.com/new) or use our [Repository Template](https://github.com/varunsridharan/template-github-workflow-sync) 
+Create a [New Repository](https://github.com/new) or use our [Repository Template](https://github.com/varunsridharan/template-github-workflow-sync/generate) 
 
 ### Step 2
 if you have used our template repository then edit the file inside `.github/workflows/workflow-sync.yml`
