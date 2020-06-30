@@ -72,9 +72,9 @@ for R in "${REPOSITORIES[@]}"; do
       if [ "$SRC_FULL_PATH" != "" ]; then
         echo "Copying : $SRC_FULL_PATH --> ${LOCAL_PATH}${DEST_FILE}"
         cp "$SRC_FULL_PATH" "${LOCAL_PATH}${DEST_FILE}"
+        git add "${LOCAL_PATH}${DEST_FILE}" -f
 
         if [ "$(git status --porcelain)" != "" ]; then
-          git add "${LOCAL_PATH}${DEST_FILE}" -f
           git commit -m "💬 #${GITHUB_RUN_NUMBER} - Workflow File ${DEST_STATUS} / ⚡ Triggered By ${GITHUB_REPOSITORY}@${GITHUB_SHA}"
         else
           echo "✅ Nothing Changed For Workflow : ${SRC_FILE}"
@@ -90,6 +90,13 @@ for R in "${REPOSITORIES[@]}"; do
 
     echo " "
   done
+
+  echo "--------------------------------------"
+  echo "Workflow Files Inside ${LOCAL_PATH}"
+  cd ${LOCAL_PATH}
+  ls -lah
+  cd ${GIT_PATH}
+  echo "--------------------------------------"
 
   if [ -z "$DRY_RUN" ]; then
     echo "⚠️ No changes will be pushed to ${R}"
