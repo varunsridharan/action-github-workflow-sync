@@ -27,6 +27,7 @@ for R in "${REPOSITORIES[@]}"; do
   LOCAL_PATH="${GIT_PATH}/.github/workflows/"
   DEST_STATUS="Updated"
   echo "Git URL : $REPO_URL"
+  echo "Clone Path : $GIT_PATH"
   git clone --no-tags --depth 1 $REPO_URL ${R}
   echo " "
 
