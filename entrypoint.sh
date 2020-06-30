@@ -7,11 +7,12 @@ GITHUB_TOKEN="$INPUT_GITHUB_TOKEN"
 DRY_RUN="$INPUT_DRY_RUN"
 REPOSITORIES=($RAW_REPOSITORIES)
 WORKFLOW_FILES=($RAW_WORKFLOW_FILES)
-TEMP_PATH="/github_workflow_sync/"
+TEMP_PATH="/wfsync/"
 cd /
 echo " "
 echo "⚙️ Basic Setup"
 echo "DRY_RUN: $DRY_RUN"
+git config --system core.longpaths true
 git config --global user.email "githubactionbot+workflowsync@gmail.com" && git config --global user.name "GH Actions Workflow Sync Bot"
 mkdir "$TEMP_PATH"
 cd "$TEMP_PATH"
