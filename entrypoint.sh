@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+#set -eu
 
 RAW_REPOSITORIES="$INPUT_REPOSITORIES"
 RAW_WORKFLOW_FILES="$INPUT_WORKFLOW_FILES"
@@ -9,14 +9,19 @@ REPOSITORIES=($RAW_REPOSITORIES)
 WORKFLOW_FILES=($RAW_WORKFLOW_FILES)
 TEMP_PATH="/gh/"
 cd /
-echo " "
-echo "⚙️ Basic Setup"
-echo "DRY_RUN: $DRY_RUN"
+mkdir "$TEMP_PATH"
+cd "$TEMP_PATH"
 git config --system core.longpaths true
 git config --global core.longpaths true
 git config --global user.email "githubactionbot+workflowsync@gmail.com" && git config --global user.name "GH Actions Workflow Sync Bot"
-mkdir "$TEMP_PATH"
-cd "$TEMP_PATH"
+
+echo " "
+echo "⚙️ Basic Setup"
+echo "---------------------------------------------"
+echo "DRY_RUN         : $DRY_RUN"
+echo "Workflow Files  : $WORKFLOW_FILES"
+echo "Temp Path       : $TEMP_PATH"
+echo "---------------------------------------------"
 echo " "
 
 # Loops All Provided Repos
@@ -27,8 +32,10 @@ for R in "${REPOSITORIES[@]}"; do
   GIT_PATH="${TEMP_PATH}${R}"
   LOCAL_PATH="${GIT_PATH}/.github/workflows/"
   DEST_STATUS="Updated"
-  echo "Git URL : $REPO_URL"
-  echo "Clone Path : $GIT_PATH"
+  echo "---------------------------------------------"
+  echo "Github URL         : $REPO_URL"
+  echo "Clone To           : $GIT_PATH"
+  echo "---------------------------------------------"
   git clone --quiet --no-hardlinks --no-tags --depth 1 $REPO_URL ${R}
   echo " "
 
@@ -63,6 +70,7 @@ for R in "${REPOSITORIES[@]}"; do
       fi
 
       if [ "$SRC_FULL_PATH" != "" ]; then
+        echo "Copying : $SRC_FULL_PATH --> ${LOCAL_PATH}${DEST_FILE}"
         cp "$SRC_FULL_PATH" "${LOCAL_PATH}${DEST_FILE}"
 
         if [ "$(git status --porcelain)" != "" ]; then
