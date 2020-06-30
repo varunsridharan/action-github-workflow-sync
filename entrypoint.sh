@@ -23,12 +23,12 @@ for R in "${REPOSITORIES[@]}"; do
   echo "###[group] 📓  $R"
 
   REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/${R}.git"
-  GIT_PATH="${TEMP_PATH}/gh"
+  GIT_PATH="${TEMP_PATH}${R}"
   LOCAL_PATH="${GIT_PATH}/.github/workflows/"
   DEST_STATUS="Updated"
   echo "Git URL : $REPO_URL"
   echo "Clone Path : $GIT_PATH"
-  git clone --no-hardlinks --no-tags --depth 1 $REPO_URL ${GIT_PATH}
+  git clone --quiet --no-hardlinks --no-tags --depth 1 $REPO_URL ${R}
   echo " "
 
   if [ ! -d "$LOCAL_PATH" ]; then
@@ -65,7 +65,7 @@ for R in "${REPOSITORIES[@]}"; do
         cp "$SRC_FULL_PATH" "${LOCAL_PATH}${DEST_FILE}"
 
         if [ "$(git status --porcelain)" != "" ]; then
-          git add ${LOCAL_PATH}${DEST_FILE} -f
+          git add "${LOCAL_PATH}${DEST_FILE}" -f
           git commit -m "💬 #${GITHUB_RUN_NUMBER} - Workflow File ${DEST_STATUS} / ⚡ Triggered By ${GITHUB_REPOSITORY}@${GITHUB_SHA}"
         else
           echo "✅ Nothing Changed For Workflow : ${SRC_FILE}"
@@ -91,5 +91,4 @@ for R in "${REPOSITORIES[@]}"; do
   fi
   echo "###[endgroup]"
   cd $TEMP_PATH
-  rm -rf ${GIT_PATH}
 done
