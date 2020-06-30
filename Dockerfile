@@ -1,12 +1,12 @@
-#FROM debian:stable-slim
+FROM debian:stable-slim
 
-#RUN apt-get update && apt-get install -y git
+RUN apt-get update && apt-get install -y git
 
-FROM alpine:latest
+#FROM alpine:latest
 
-RUN apk add --no-cache bash
+#RUN apk add --no-cache bash
 
-RUN apk add git
+#RUN apk add git
 
 COPY entrypoint.sh /entrypoint.sh
 
