@@ -51,10 +51,10 @@ for R in "${REPOSITORIES[@]}"; do
   for WOF in "${WORKFLOW_FILES[@]}"; do
     WORKFLOW_FILE=($(echo $WOF | tr "=" "\n"))
     SRC_FILE=${WORKFLOW_FILE[0]}
-    DEST_FILE=""
     SRC_FULL_PATH=""
     SRC_FILE_NAME=$(basename "$SRC_FILE")
     SRC_FILE_EXT="${SRC_FILE_NAME##*.}"
+    DEST_FILE="${SRC_FILE_NAME}"
 
     if [ "$SRC_FILE_EXT" != "yml" ]; then
       echo "⚠️ ${SRC_FILE} Is Not A Valid Github Actions Workflow File"
