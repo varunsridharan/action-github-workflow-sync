@@ -84,8 +84,10 @@ for R in "${REPOSITORIES[@]}"; do
 
   if [ -z "$DRY_RUN" ]; then
     echo "⚠️ No changes will be pushed to ${R}"
+    git status
   elif [ "$DRY_RUN" = true ]; then
     echo "⚠️ No changes will be pushed to ${R}"
+    git status
   else
     git push $REPO_URL
   fi
