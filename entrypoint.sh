@@ -28,7 +28,7 @@ for R in "${REPOSITORIES[@]}"; do
   DEST_STATUS="Updated"
   echo "Git URL : $REPO_URL"
   echo "Clone Path : $GIT_PATH"
-  git clone --ignore-errors --no-tags --depth 1 $REPO_URL ${R}
+  git clone --no-hardlinks --no-tags --depth 1 $REPO_URL ${R}
   echo " "
 
   if [ ! -d "$LOCAL_PATH" ]; then
