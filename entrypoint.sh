@@ -13,6 +13,7 @@ echo " "
 echo "⚙️ Basic Setup"
 echo "DRY_RUN: $DRY_RUN"
 git config --system core.longpaths true
+git config --global core.longpaths true
 git config --global user.email "githubactionbot+workflowsync@gmail.com" && git config --global user.name "GH Actions Workflow Sync Bot"
 mkdir "$TEMP_PATH"
 cd "$TEMP_PATH"
