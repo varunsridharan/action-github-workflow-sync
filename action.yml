@@ -13,11 +13,23 @@ inputs:
     description: 'Local Workflow Files To Sync'
     default: ''
     required: true
+  WORKFLOW_FILES_DIR:
+    description: 'Local Path Where Common Workflow Files Are Located'
+    default: 'workflows'
+    required: false
   GITHUB_TOKEN:
     description: "Token to use to get repos and write secrets"
     required: true
   DRY_RUN:
     description: "Run everything except for nothing will be Updated."
+    required: false
+    default: 'false'
+  AUTO_CREATE_NEW_BRANCH:
+    description: "Auto Create New Branch If Not Exists ?"
+    required: false
+    default: 'false'
+  COMMIT_EACH_FILE:
+    description: "If set to true then all files are commited 1 by 1 instead of commiting everything @ once"
     required: false
     default: 'false'
 
@@ -29,3 +41,6 @@ runs:
     - ${{ inputs.WORKFLOW_FILES }}
     - ${{ inputs.GITHUB_TOKEN }}
     - ${{ inputs.DRY_RUN }}
+    - ${{ inputs.WORKFLOW_FILES_DIR }}
+    - ${{ inputs.COMMIT_EACH_FILE }}
+    - ${{ inputs.AUTO_CREATE_NEW_BRANCH }}
