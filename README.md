@@ -170,7 +170,7 @@ jobs:
       - name: Fetching Local Repository
         uses: actions/checkout@master
       - name: Running Workflow Sync
-        uses: varunsridharan/action-github-workflow-sync@master
+        uses: varunsridharan/action-github-workflow-sync@main
         with:
           DRY_RUN: ${{ env.DRY_RUN }}
           REPOSITORIES: ${{ env.REPOSITORIES }}
