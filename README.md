@@ -10,16 +10,21 @@ _This Github Action can come in handy when you have lot of projects like i do._
 _where in some case certain projects users action workflow which are common across projects._
 _Example : [Project 1][project1] & [Project 2][project2] it can be pain to keep all the workflow updated with Github Action's Module's version._
 
+This also isn't limited to Github Action yaml files - another use case could be keeping the `.editorconfig`, `LICENSE`, `tsconfig.json`, `tslint.json`, `.gitignore`, `azure-pieplines.yml`, etc. in sync across all your repositories.
+
 >_Here where this action comes in and reduces your stress 😉 it can update all your repository actions file based on the config provided_ 
 
 ## ⚙️ Configuration
 
-| **Argument** | Description |
-| --- | :---: | 
-| `github_token` | **Required** Token to use to get repos and write secrets. `${{secrets.GITHUB_TOKEN}}` will not work. instead **Personal Access Token Required*** |
-| `repositories` | **Required** New line deliminated regex expressions to select repositories. Repositires are limited to those in whcich the token user is an owner or collaborator. |
-| `workflow_files` | **Required** New line deliminated regex expressions. workflow files to be copied to provided repositores |
-| `dry_run` | Run everything except for nothing will be pushed. |
+| **Argument** | Defaults | Description |
+| --- | :---: | :---: | 
+| `GITHUB_TOKEN` | - | **Required** Token to use to get repos and write secrets. `${{secrets.GITHUB_TOKEN}}` will not work. instead **Personal Access Token Required*** |
+| `REPOSITORIES` | - | **Required** New line deliminated regex expressions to select repositories. Repositires are limited to those in whcich the token user is an owner or collaborator. |
+| `WORKFLOW_FILES` | - | **Required** New line deliminated regex expressions. workflow files to be copied to provided repositores |
+| `DRY_RUN` | ***false*** | Run everything except for nothing will be pushed. |
+| `WORKFLOW_FILES_DIR` | ***workflows*** | Local Path Where Common Workflow Files Are Located ***Eg : `workflows`*** |
+| `AUTO_CREATE_NEW_BRANCH` | ***false*** | Auto create new brach in a repository if the branch dose not exists |
+| `COMMIT_EACH_FILE` | ***false*** | if you need to keep track of each file's commit history separate then set it to true |
 
 ### Personal Access Token Scope
 #### [Github Personal Token](https://github.com/settings/tokens/new?description=gh-workflow-sync)  <small> Is required with the below scope </small>
@@ -31,29 +36,106 @@ _Example : [Project 1][project1] & [Project 2][project2] it can be pain to keep 
 
 ***[Click Here To Generate A Token](https://github.com/settings/tokens/new?description=gh-workflow-sync)***
 
-### `workflow_files`
-**Example** 
+---
+
+### `REPOSITORIES` Configuration Examples
+<details><summary><strong>Repository With Default Brach</strong></summary>
+
 ```yaml
-WORKFLOW_FILES: |
-    your-workflow-file1.yml
-    your-workflow-file2.yml
+REPOSITORIES: |
+    username/repo
+    username/repo2
 ```
 
-**Example | Custom File Location** 
-```yaml
-WORKFLOW_FILES: |
-    ./your-folder/your-workflow-file1.yml
-    ./your-folder/your-workflow-file2.yml
-```
+</details>
 
-**Example | Custom File Name** 
-Action will locate `your-workflow-file1.yml` from in your repository where this action is used & `your-custom-workflow-file.yml` will be the new file name which will be used to store in the repository you provided
+<details><summary><strong>Repositry With Custom Branch</strong></summary>
+
 ```yaml
-WORKFLOW_FILES: |
-    ./your-folder/your-workflow-file1.yml=your-custom-workflow-file.yml
+REPOSITORIES: |
+    username/repo@dev
+    username/repo1@dev2
 ```
+> You Can also have same repository multiple times if you provide different branch name
+</details>
 
 ---
+
+### `WORKFLOW_FILES` Configuration Examples
+
+<details><summary><strong>Files - Source & Destination File Without Custom Name</strong></summary>
+
+```yaml
+WORKFLOW_FILES: |
+    dependabot.yml
+    .github/settings.yml
+```
+> **dependabot.yml** will save in root folder in the repository
+>
+> **.github/settings.yml** will save in `.github` in the repository
+
+</details>
+
+<details><summary><strong>Files - Source File In Root & Destination File In Custom Location</strong></summary>
+
+```yaml
+WORKFLOW_FILES: |
+    hello-bot.yml=.github/
+    pr-bot.yml=.github/pull-request.yml
+```
+> **hello-bot.yml** will save in `.github` in the repository with the same name
+>
+> **pr-bot.yml** will save in `.github` in the repository with the name `pull-request.yml`
+</details>
+
+<details><summary><strong>Folders - Source & Destination Folders Without Custom Name</strong></summary>
+
+```yaml
+WORKFLOW_FILES: |
+    folder1
+    .github/folder2
+```
+> **folder1** will save in root folder in the repository
+>
+> **.github/folder2** will save in `.github` in the repository
+
+</details>
+
+<details><summary><strong>Folders - Source & Destination Folders With Custom Name</strong></summary>
+
+```yaml
+WORKFLOW_FILES: |
+    folder1=./save-to-folder
+    .github/folder2=custom-folder/save-to-folder2
+```
+> **folder1** will save inside `REPOSITORY ROOT` in the name of `save-to-folder`
+>
+> **.github/folder2** will save inside `custom-folder` in the name of `save-to-folder2`
+
+</details>
+
+---
+
+## How Files Sync Work ?
+Before copying the **WORKFLOW_FILES** from the source to destination. this action will provide some flexibility.
+this searchs for a file in various locations for example lets take `settings.yml` as the file that you want to sync for multiple repository
+
+#### Below are the locations that this action search for the file/folder
+* `./{OWNER}/{REPO_NAME}/workflows/{filename}`
+* `./{OWNER}/workflows/{filename}`
+* `./{WORKFLOW_FILES_DIR}/{filename}`
+* `./.github/workflows/{filename}`
+* `./{OWNER}/{REPO_NAME}/{filename}`
+* `./{OWNER}/{filename}`
+* `./{filename}`
+
+> if the `settings.yml` is found inside `workflows` folder then the destination is automaitcally forced to `.github/workflows` in the destination repo
+>
+> if the `settings.yml` is outside of `workflows` folder then the destination then its copied to the destination
+
+### How this can be useful ?
+Lets assume that you want to maintain all the common github files in a single repository and suddenly a repository needs a single file to be changed in that case instead of editing the action yml file. you can just create a folder like `{REPO_OWNER}/{REPO_NAME}/{FILE}` to copy the overriden file to the destination
+
 
 ## 🚀 Usage
 
@@ -65,7 +147,7 @@ if you have used our template repository then edit the file inside `.github/work
 
 OR
 
-Create a new file in `.github/workflows/` named ***workflow-sync.yml** and copy & paste the below file content
+Create a new file in `.github/workflows/` named **workflow-sync.yml** and copy & paste the below file content
 
 #### `workflow-sync.yml` content
 ```yaml
@@ -96,6 +178,36 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
 ```
+
+## Troubleshooting
+
+### Spacing
+Spacing around the equal sign is important. For example, this will not work:
+
+```yaml
+WORKFLOW_FILES: |
+  folder/file-sync.yml = folder/test.txt
+```
+
+It passes to the shell file 3 distinct objects
+
+* folder/file-sync.ymll
+* =
+* folder/test.txt
+
+instead of 1 object
+
+* folder/file-sync.yml = folder/test.txt
+
+and there is nothing I can do in code to make up for that
+
+### Slashes
+
+You do not need (nor want) leading `/` for the file path on either side of the equal sign
+
+The only time you need `/` trailing is for folder copies. 
+While a file copy will technically still work with a leading `/`, a folder copy will not
+
 ---
 
 ## 📝 Changelog
