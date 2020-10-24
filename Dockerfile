@@ -1,8 +1,4 @@
-FROM alpine:latest
-
-RUN apk add --no-cache bash
-
-RUN apk add git
+FROM varunsridharan/actions-alpine:latest
 
 COPY entrypoint.sh /entrypoint.sh
 
