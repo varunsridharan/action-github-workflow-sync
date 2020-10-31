@@ -14,15 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "📥  Fetching Repository Contents"
-        uses: actions/checkout@master
+        uses: actions/checkout@main
 
       - name: "💾  Github Repository Metadata"
-        uses: varunsridharan/action-repository-meta@master
+        uses: varunsridharan/action-repository-meta@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "💫  VS Utility"
-        uses: varunsridharan/action-vs-utility@master
+        uses: varunsridharan/action-vs-utility@main
         env:
           SVA_ONL_TOKEN: ${{ secrets.SVA_ONL_TOKEN }}
 
