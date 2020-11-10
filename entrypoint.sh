@@ -101,7 +101,7 @@ for R in "${REPOSITORIES[@]}"; do
 
   gh_log
   cd "$GIT_PATH"
-  gitconfiglocal "Github Actions Workflow Sync Bot" "githubactionbot+workflowsync@gmail.com"
+  gitconfig "Github Actions Workflow Sync Bot" "githubactionbot+workflowsync@gmail.com"
   if [ "$IS_BRANCH_CREATED" = false ]; then
     git pull >/dev/null 2>&1
   fi
