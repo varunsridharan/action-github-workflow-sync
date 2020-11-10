@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-cd /
 wget https://raw.githubusercontent.com/varunsridharan/actions-toolkit/main/setup-toolkit.sh >/dev/null 2>&1
 chmod uga+x setup-toolkit.sh
 sh setup-toolkit.sh "${GITHUB_WORKSPACE}/omg/abc/"
