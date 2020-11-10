@@ -17,8 +17,8 @@ gh_validate_input "WORKFLOW_FILES" "WORKFLOW_FILES List is required"
 # Configure Github Details
 gh_log
 gitconfig "Github Actions Workflow Sync Bot" "githubactionbot+workflowsync@gmail.com"
-git config --system core.longpaths true
-git config --global core.longpaths true
+sudo git config --system core.longpaths true
+sudo git config --global core.longpaths true
 
 # Make Temp Work Directory
 TEMP_PATH="/workflow-sync/"
