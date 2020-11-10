@@ -21,7 +21,7 @@ sudo git config --system core.longpaths true
 sudo git config --global core.longpaths true
 
 # Make Temp Work Directory
-TEMP_PATH="${GITHUB_WORKSPACE}/../workflow-sync/"
+TEMP_PATH="/tmp/workflow-sync/"
 sudo mkdir "$TEMP_PATH"
 
 # Fetch Input Vars
