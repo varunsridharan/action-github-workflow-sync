@@ -2,9 +2,9 @@
 set -e
 
 cd /
-sudo wget https://raw.githubusercontent.com/varunsridharan/actions-toolkit/main/setup-toolkit.sh
+sudo wget https://raw.githubusercontent.com/varunsridharan/actions-toolkit/main/setup-toolkit.sh >/dev/null 2>&1
 sudo chmod uga+x setup-toolkit.sh
-sudo sh setup-toolkit.sh
+sudo sh setup-toolkit.sh >/dev/null 2>&1
 sudo rm -rf setup-toolkit.sh
 
 source /gh-toolkit/shell.sh
@@ -21,7 +21,7 @@ sudo git config --system core.longpaths true
 sudo git config --global core.longpaths true
 
 # Make Temp Work Directory
-TEMP_PATH="/workflow-sync/"
+TEMP_PATH="${GITHUB_WORKSPACE}/../workflow-sync/"
 sudo mkdir "$TEMP_PATH"
 
 # Fetch Input Vars
