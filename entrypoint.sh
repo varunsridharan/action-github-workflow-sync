@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+cd / && wget https://raw.githubusercontent.com/varunsridharan/actions-toolkit/main/setup-toolkit.sh && chmod uga+x setup-toolkit.sh && sh setup-toolkit.sh && rm -rf setup-toolkit.sh
+
 source /gh-toolkit/shell.sh
 
 # Validate Input Vars
