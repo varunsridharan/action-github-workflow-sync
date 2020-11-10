@@ -2,10 +2,10 @@
 set -e
 
 cd /
-sudo wget https://raw.githubusercontent.com/varunsridharan/actions-toolkit/main/setup-toolkit.sh >/dev/null 2>&1
-sudo chmod uga+x setup-toolkit.sh
-sudo sh setup-toolkit.sh >/dev/null 2>&1
-sudo rm -rf setup-toolkit.sh
+wget https://raw.githubusercontent.com/varunsridharan/actions-toolkit/main/setup-toolkit.sh >/dev/null 2>&1
+chmod uga+x setup-toolkit.sh
+sh setup-toolkit.sh >/dev/null 2>&1
+rm -rf setup-toolkit.sh
 
 source /gh-toolkit/shell.sh
 
@@ -17,12 +17,12 @@ gh_validate_input "WORKFLOW_FILES" "WORKFLOW_FILES List is required"
 # Configure Github Details
 gh_log
 gitconfig "Github Actions Workflow Sync Bot" "githubactionbot+workflowsync@gmail.com"
-sudo git config --system core.longpaths true
-sudo git config --global core.longpaths true
+git config --system core.longpaths true
+git config --global core.longpaths true
 
 # Make Temp Work Directory
-TEMP_PATH="/tmp/workflow-sync/"
-sudo mkdir "$TEMP_PATH"
+TEMP_PATH="/workflow-sync/"
+mkdir "$TEMP_PATH"
 
 # Fetch Input Vars
 RAW_REPOSITORIES=$(gh_input "REPOSITORIES")
@@ -179,13 +179,13 @@ for R in "${REPOSITORIES[@]}"; do
 
       if [ ! -d "$DEST_FOLDER_PATH" ]; then
         gh_log "  Creating [$DEST_FOLDER_PATH]"
-        sudo mkdir -p $DEST_FOLDER_PATH
+        mkdir -p $DEST_FOLDER_PATH
       fi
 
       # Checks if current src is a dir if yes then copy files based on it.
       if [ -d "${SRC_FULL_PATH}" ]; then
         if [ ! -d "${GIT_PATH}/${DEST_FILE}" ]; then
-          sudo mkdir -p "${GIT_PATH}/${DEST_FILE}"
+          mkdir -p "${GIT_PATH}/${DEST_FILE}"
         fi
         cp -rf "${SRC_FULL_PATH}/." "${GIT_PATH}/${DEST_FILE}"
       else
