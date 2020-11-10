@@ -1,0 +1,73 @@
+name: "Release - Github 🐳 Registry"
+
+env:
+  DIST_LOCATION: "./dist/"
+  VS_WORKFLOW_TYPE: "github-docker-release"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  release:
+    types:
+      - published
+
+jobs:
+  publish-github-docker:
+    name: "🚀  Github 🐳 Registry Publisher"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "📥  Fetching Repository Contents"
+        uses: actions/checkout@main
+
+      - name: "💾  Github Repository Metadata"
+        uses: varunsridharan/action-repository-meta@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "💫  VS Utility"
+        uses: varunsridharan/action-vs-utility@main
+
+      - name: "⚡  Repository - Before Hook"
+        run: |
+          echo " "
+          if [ -f $VS_BEFORE_HOOK_FILE_LOCATION ]; then
+            echo "✅ Before Hook File Found : $VS_BEFORE_HOOK_FILE_LOCATION"
+            sh $VS_BEFORE_HOOK_FILE_LOCATION
+          else
+            echo "⚠️ No Before Hook File Found : $VS_BEFORE_HOOK_FILE_LOCATION"
+          fi
+          echo " "
+
+      - name: "⚡ Docker QEMU"
+        uses: docker/setup-qemu-action@master
+
+      - name: "⚡ Docker BuildX"
+        uses: docker/setup-buildx-action@master
+
+      - name: "🔒  Log into GitHub Container Registry"
+        uses: docker/login-action@master
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_REPO }}
+
+      - name: "🎉  Build &  🚀  Publish"
+        uses: docker/build-push-action@master
+        with:
+          push: true
+          tags: |
+            ghcr.io/${{ env.REPOSITORY_OWNER }}/${{ env.DOCKER_IMAGE_SLUG }}:latest
+            ghcr.io/${{ env.REPOSITORY_OWNER }}/${{ env.DOCKER_IMAGE_SLUG }}:${{ env.RELEASE_VERSION }}
+
+      - name: "⚡  Repository - After Hook"
+        run: |
+          echo " "
+          if [ -f $VS_AFTER_HOOK_FILE_LOCATION ]; then
+            echo "✅ After Hook File Found : $VS_AFTER_HOOK_FILE_LOCATION"
+            sh $VS_AFTER_HOOK_FILE_LOCATION
+          else
+            echo "⚠️ No After Hook File Found : $VS_AFTER_HOOK_FILE_LOCATION"
+          fi
+          echo " "
