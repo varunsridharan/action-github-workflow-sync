@@ -3,7 +3,7 @@ set -e
 
 wget https://raw.githubusercontent.com/varunsridharan/actions-toolkit/main/setup-toolkit.sh >/dev/null 2>&1
 chmod uga+x setup-toolkit.sh
-sudo sh setup-toolkit.sh >/dev/null 2>&1
+sh setup-toolkit.sh >/dev/null 2>&1
 rm -rf setup-toolkit.sh
 
 source /gh-toolkit/shell.sh
@@ -15,8 +15,8 @@ gh_validate_input "WORKFLOW_FILES" "WORKFLOW_FILES List is required"
 
 # Configure Github Details
 gh_log
-sudo git config --system core.longpaths true
-sudo git config --global core.longpaths true
+git config --system core.longpaths true
+git config --global core.longpaths true
 
 # Make Temp Work Directory
 TEMP_PATH="${GITHUB_WORKSPACE}/workflow-sync/"
