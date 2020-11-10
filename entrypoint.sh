@@ -3,7 +3,7 @@ set -e
 
 wget https://raw.githubusercontent.com/varunsridharan/actions-toolkit/main/setup-toolkit.sh >/dev/null 2>&1
 chmod uga+x setup-toolkit.sh
-sh setup-toolkit.sh "${GITHUB_WORKSPACE}/../../toolkit/" >/dev/null 2>&1
+sh setup-toolkit.sh "${GITHUB_WORKSPACE}/../../toolkit/" # >/dev/null 2>&1
 rm -rf setup-toolkit.sh
 
 source "${GITHUB_WORKSPACE}/../../toolkit/shell.sh"
