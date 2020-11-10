@@ -3,7 +3,7 @@ set -e
 BASE_DIR=$(dirname "$(dirname $GITHUB_WORKSPACE)")
 wget https://raw.githubusercontent.com/varunsridharan/actions-toolkit/main/setup-toolkit.sh >/dev/null 2>&1
 chmod uga+x setup-toolkit.sh
-sh setup-toolkit.sh "${BASE_DIR}/toolkit/" # >/dev/null 2>&1
+sh setup-toolkit.sh "${BASE_DIR}/toolkit/" >/dev/null 2>&1
 rm -rf setup-toolkit.sh
 
 source "${BASE_DIR}/toolkit/shell.sh"
