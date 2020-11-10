@@ -15,7 +15,7 @@ gh_validate_input "WORKFLOW_FILES" "WORKFLOW_FILES List is required"
 
 # Configure Github Details
 gh_log
-git config --system core.longpaths true
+#git config --system core.longpaths true
 git config --global core.longpaths true
 
 # Make Temp Work Directory
