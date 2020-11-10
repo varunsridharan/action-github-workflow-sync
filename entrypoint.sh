@@ -1,7 +1,11 @@
 #!/bin/bash
 set -e
 
-cd / && wget https://raw.githubusercontent.com/varunsridharan/actions-toolkit/main/setup-toolkit.sh && chmod uga+x setup-toolkit.sh && sh setup-toolkit.sh && rm -rf setup-toolkit.sh
+cd /
+sudo wget https://raw.githubusercontent.com/varunsridharan/actions-toolkit/main/setup-toolkit.sh
+sudo chmod uga+x setup-toolkit.sh
+sudo sh setup-toolkit.sh
+sudo rm -rf setup-toolkit.sh
 
 source /gh-toolkit/shell.sh
 
@@ -18,7 +22,7 @@ git config --global core.longpaths true
 
 # Make Temp Work Directory
 TEMP_PATH="/workflow-sync/"
-mkdir "$TEMP_PATH"
+sudo mkdir "$TEMP_PATH"
 
 # Fetch Input Vars
 RAW_REPOSITORIES=$(gh_input "REPOSITORIES")
@@ -175,13 +179,13 @@ for R in "${REPOSITORIES[@]}"; do
 
       if [ ! -d "$DEST_FOLDER_PATH" ]; then
         gh_log "  Creating [$DEST_FOLDER_PATH]"
-        mkdir -p $DEST_FOLDER_PATH
+        sudo mkdir -p $DEST_FOLDER_PATH
       fi
 
       # Checks if current src is a dir if yes then copy files based on it.
       if [ -d "${SRC_FULL_PATH}" ]; then
         if [ ! -d "${GIT_PATH}/${DEST_FILE}" ]; then
-          mkdir -p "${GIT_PATH}/${DEST_FILE}"
+          sudo mkdir -p "${GIT_PATH}/${DEST_FILE}"
         fi
         cp -rf "${SRC_FULL_PATH}/." "${GIT_PATH}/${DEST_FILE}"
       else
