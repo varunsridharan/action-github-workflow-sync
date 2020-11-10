@@ -3,7 +3,7 @@ set -e
 
 wget https://raw.githubusercontent.com/varunsridharan/actions-toolkit/main/setup-toolkit.sh >/dev/null 2>&1
 chmod uga+x setup-toolkit.sh
-sh setup-toolkit.sh "${GITHUB_WORKSPACE}/omg/abc/"
+sudo sh setup-toolkit.sh >/dev/null 2>&1
 rm -rf setup-toolkit.sh
 
 source /gh-toolkit/shell.sh
@@ -20,8 +20,8 @@ git config --system core.longpaths true
 git config --global core.longpaths true
 
 # Make Temp Work Directory
-TEMP_PATH="/workflow-sync/"
-mkdir "$TEMP_PATH"
+TEMP_PATH="${GITHUB_WORKSPACE}/workflow-sync/"
+mkdir -p "$TEMP_PATH"
 
 # Fetch Input Vars
 RAW_REPOSITORIES=$(gh_input "REPOSITORIES")
@@ -238,3 +238,5 @@ for R in "${REPOSITORIES[@]}"; do
   cd "${TEMP_PATH}"
   rm -rf "${GIT_PATH}"
 done
+
+rm -rf "${TEMP_PATH}"
