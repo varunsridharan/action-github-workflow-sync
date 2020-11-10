@@ -1,12 +1,12 @@
 #!/bin/bash
 set -e
-
+BASE_DIR=$(dirname "$(dirname $GITHUB_WORKSPACE)")
 wget https://raw.githubusercontent.com/varunsridharan/actions-toolkit/main/setup-toolkit.sh >/dev/null 2>&1
 chmod uga+x setup-toolkit.sh
-sh setup-toolkit.sh "${GITHUB_WORKSPACE}/../../toolkit/" # >/dev/null 2>&1
+sh setup-toolkit.sh "${BASE_DIR}/toolkit/" # >/dev/null 2>&1
 rm -rf setup-toolkit.sh
 
-source "${GITHUB_WORKSPACE}/../../toolkit/shell.sh"
+source "${BASE_DIR}/toolkit/shell.sh"
 
 # Validate Input Vars
 gh_validate_input "GITHUB_TOKEN" "Github Personal Access Token Is Required To Run This Action !"
@@ -19,7 +19,7 @@ git config --system core.longpaths true
 git config --global core.longpaths true
 
 # Make Temp Work Directory
-TEMP_PATH="${GITHUB_WORKSPACE}/../../workflow-sync/"
+TEMP_PATH="${BASE_DIR}/workflow-sync/"
 mkdir -p "$TEMP_PATH"
 
 # Fetch Input Vars
