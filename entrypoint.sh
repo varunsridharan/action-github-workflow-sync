@@ -10,8 +10,7 @@ gh_validate_input "WORKFLOW_FILES" "WORKFLOW_FILES List is required"
 
 # Configure Github Details
 gh_log
-gitconfig "Github Actions Workflow Sync Bot" "githubactionbot+workflowsync@gmail.com"
-git config --system core.longpaths true
+#git config --system core.longpaths true
 git config --global core.longpaths true
 
 # Make Temp Work Directory
@@ -97,7 +96,7 @@ for R in "${REPOSITORIES[@]}"; do
 
   gh_log
   cd "$GIT_PATH"
-
+  gitconfig "Github Actions Workflow Sync Bot" "githubactionbot+workflowsync@gmail.com"
   if [ "$IS_BRANCH_CREATED" = false ]; then
     git pull >/dev/null 2>&1
   fi
