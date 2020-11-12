@@ -1,0 +1,32 @@
+{
+ "name": "action-github-workflow-sync",
+ "version": "1.0.0",
+ "description": "Github Action To Sync Github Action's Workflow Files Across Repositories",
+ "main": "src/index.js",
+ "scripts": {
+  "prepare": "ncc build src/index.js -o dist --source-map --license licenses.txt"
+ },
+ "repository": {
+  "type": "git",
+  "url": "git+https://github.com/actions/javascript-action.git"
+ },
+ "keywords": [
+  "GitHub",
+  "Actions",
+  "JavaScript"
+ ],
+ "author": "Varun Sridharan <varunsridharan23@gmail.com> (https://varunsridharan.in)",
+ "license": "MIT",
+ "bugs": {
+  "url": "https://github.com/actions/javascript-action/issues"
+ },
+ "homepage": "https://github.com/actions/javascript-action#readme",
+ "dependencies": {
+  "@actions/core": "^1.2.5"
+ },
+ "devDependencies": {
+  "@vercel/ncc": "^0.24.0",
+  "eslint": "^7.4.0",
+  "jest": "^26.1.0"
+ }
+}
