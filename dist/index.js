@@ -3071,9 +3071,9 @@ const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSI
 				relative_path: `${LOCATION}`,
 				dest_type: 'workflow',
 			}
-			core.info( `✅  ${GITHUB_WORKSPACE}/${LOCATION}` );
+			core.info( `	✅  ${GITHUB_WORKSPACE}/${LOCATION}` );
 		} else {
-			core.info( `🛑  ${GITHUB_WORKSPACE}/${LOCATION}` );
+			core.info( `	🛑  ${GITHUB_WORKSPACE}/${LOCATION}` );
 		}
 	} );
 
@@ -3085,9 +3085,9 @@ const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSI
 					relative_path: `${LOCATION}`,
 					dest_type: false,
 				}
-				core.info( `✅  ${GITHUB_WORKSPACE}/${LOCATION}` );
+				core.info( `	✅  ${GITHUB_WORKSPACE}/${LOCATION}` );
 			} else {
-				core.info( `🛑  ${GITHUB_WORKSPACE}/${LOCATION}` );
+				core.info( `	🛑  ${GITHUB_WORKSPACE}/${LOCATION}` );
 			}
 		} );
 	}
@@ -3147,7 +3147,7 @@ async function run() {
 	 */
 	await helper.asyncForEach( REPOSITORIES, async function( raw_repository, index ) {
 		core.startGroup( `📓 ${raw_repository}` );
-		core.info( `${style.magenta.open}⚙️ Repository Config${style.magenta.open}` );
+		core.info( `${style.magenta.open}⚙️ Repository Config${style.magenta.close}` );
 		let { repository, branch, owner, git_url, local_path } = helper.repositoryDetails( raw_repository );
 		core.info( `	Slug        : ${repository}` )
 		core.info( `	Owner       : ${owner}` )
@@ -3162,14 +3162,14 @@ async function run() {
 			let identity_status = await helper.set_git_config( local_path );
 			if( identity_status ) {
 				await helper.asyncForEach( WORKFLOW_FILES, async function( raw_workflow_file ) {
+					core.info( `${style.cyan.open}${raw_workflow_file}${style.cyan.close}` )
 					let workflow_file = helper.extract_workflow_file_info( raw_workflow_file );
 
 					if( false === workflow_file ) {
-						gh.error( `Unable To Parse ${raw_workflow_file}` );
+						gh.error( `	Unable To Parse ${raw_workflow_file}` );
 						return;
 					}
 
-					core.info( JSON.stringify( workflow_file ) );
 					await helper.source_file_location( WORKFLOW_FILES_DIR, owner, repository, workflow_file.src );
 				} )
 			}
