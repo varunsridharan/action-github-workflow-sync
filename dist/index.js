@@ -3110,8 +3110,8 @@ run();
 /***/ 809:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const core      = __webpack_require__( 186 );
-const { _exec } = __webpack_require__( 129 );
+const core     = __webpack_require__( 186 );
+const { exec } = __webpack_require__( 129 );
 
 function gh_env( key, _default ) {
 	let value = process.env[ key ];
@@ -3127,7 +3127,7 @@ function gh_validate_env( key, message = false ) {
 
 function execCmd( command, workingDir ) {
 	return new Promise( ( resolve, reject ) => {
-		_exec( command, { cwd: workingDir, }, ( error, stdout ) => error ? reject( error ) : resolve( stdout.trim() ) );
+		exec( command, { cwd: workingDir, }, ( error, stdout ) => error ? reject( error ) : resolve( stdout.trim() ) );
 	} );
 }
 
