@@ -401,15 +401,17 @@ exports.toCommandValue = toCommandValue;
 const core = __webpack_require__( 186 );
 
 async function run() {
-	let AUTO_CREATE_NEW_BRANCH = __webpack_require__(229).AUTO_CREATE_NEW_BRANCH;
-	let COMMIT_EACH_FILE       = __webpack_require__(229).COMMIT_EACH_FILE;
-	let DRY_RUN                = __webpack_require__(229).DRY_RUN;
-	let GITHUB_TOKEN           = __webpack_require__(229).GITHUB_TOKEN;
-	let RAW_REPOSITORIES       = __webpack_require__(229).RAW_REPOSITORIES;
-	let RAW_WORKFLOW_FILES     = __webpack_require__(229).RAW_WORKFLOW_FILES;
-	let WORKFLOW_FILES_DIR     = __webpack_require__(229).WORKFLOW_FILES_DIR;
-	let REPOSITORIES           = JSON.stringify( __webpack_require__(229).REPOSITORIES );
-	let WORKFLOW_FILES         = __webpack_require__(229).WORKFLOW_FILES;
+	let AUTO_CREATE_NEW_BRANCH = __webpack_require__(424).AUTO_CREATE_NEW_BRANCH;
+	let COMMIT_EACH_FILE       = __webpack_require__(424).COMMIT_EACH_FILE;
+	let DRY_RUN                = __webpack_require__(424).DRY_RUN;
+	let GITHUB_TOKEN           = __webpack_require__(424).GITHUB_TOKEN;
+	let RAW_REPOSITORIES       = __webpack_require__(424).RAW_REPOSITORIES;
+	let RAW_WORKFLOW_FILES     = __webpack_require__(424).RAW_WORKFLOW_FILES;
+	let WORKFLOW_FILES_DIR     = __webpack_require__(424).WORKFLOW_FILES_DIR;
+	let REPOSITORIES           = JSON.stringify( __webpack_require__(424).REPOSITORIES );
+	let WORKFLOW_FILES         = JSON.stringify( __webpack_require__(424).WORKFLOW_FILES );
+	let GITHUB_WORKSPACE       = __webpack_require__(424).GITHUB_WORKSPACE;
+	let WORKSPACE              = __webpack_require__(424).WORKSPACE;
 
 	core.info( '"-------------------------------------------------------"' );
 	core.info( '⚙️ Basic Config' );
@@ -421,6 +423,9 @@ async function run() {
 	core.info( `  * WORKFLOW_FILES_DIR         : ${WORKFLOW_FILES_DIR}` );
 	core.info( `  * REPOSITORIES               : ${REPOSITORIES}` );
 	core.info( `  * WORKFLOW_FILES             : ${WORKFLOW_FILES}` );
+	core.info( `  * GITHUB_WORKSPACE           : ${GITHUB_WORKSPACE}` );
+	core.info( `  * WORKSPACE                  : ${WORKSPACE}` );
+	core.info( `  * GITHUB_TOKEN               : ${GITHUB_TOKEN}` );
 
 	core.info( '"-------------------------------------------------------"' );
 }
@@ -432,10 +437,11 @@ run();
 
 /***/ }),
 
-/***/ 229:
+/***/ 424:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const core = __webpack_require__( 186 );
+const path = __webpack_require__( 622 );
 
 const AUTO_CREATE_NEW_BRANCH = core.getInput( 'AUTO_CREATE_NEW_BRANCH' );
 const COMMIT_EACH_FILE       = core.getInput( 'COMMIT_EACH_FILE' );
@@ -446,6 +452,8 @@ const RAW_WORKFLOW_FILES     = core.getInput( 'WORKFLOW_FILES' );
 const WORKFLOW_FILES_DIR     = core.getInput( 'WORKFLOW_FILES_DIR' );
 const REPOSITORIES           = RAW_REPOSITORIES.split( '\n' );
 const WORKFLOW_FILES         = RAW_WORKFLOW_FILES.split( '\n' );
+const GITHUB_WORKSPACE       = process.env.GITHUB_WORKSPACE;
+const WORKSPACE              = path.dirname( path.dirname( GITHUB_WORKSPACE ) );
 
 module.exports = {
 	AUTO_CREATE_NEW_BRANCH,
@@ -457,6 +465,8 @@ module.exports = {
 	WORKFLOW_FILES_DIR,
 	REPOSITORIES,
 	WORKFLOW_FILES,
+	WORKSPACE,
+	GITHUB_WORKSPACE,
 }
 
 /***/ }),
