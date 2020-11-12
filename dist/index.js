@@ -3013,8 +3013,9 @@ const set_git_config = async( local_path ) => {
 		core.info( `	> Name  : ${GIT_USER}` );
 		core.info( `	> Email : ${GIT_EMAIL}` );
 		core.info( '' );
-	} ).catch( () => {
+	} ).catch( ( error ) => {
 		gh.error( 'Unable To Set GIT Identity' );
+		core.error( error );
 		status = false;
 	} );
 	return status;
