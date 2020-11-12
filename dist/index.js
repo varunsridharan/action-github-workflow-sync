@@ -3128,7 +3128,7 @@ const GITHUB_WORKSPACE       = gh.env( 'GITHUB_WORKSPACE' );
 const WORKSPACE              = path.dirname( path.dirname( GITHUB_WORKSPACE ) ) + '/workflow-sync/';
 
 module.exports = {
-	AUTO_CREATE_NEW_BRANCH,
+	AUTO_CREATE_NEW_BRANCH: ( 'false' === AUTO_CREATE_NEW_BRANCH ) ? false : true,
 	COMMIT_EACH_FILE,
 	DRY_RUN,
 	GITHUB_TOKEN,
