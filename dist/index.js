@@ -3028,8 +3028,25 @@ const extract_workflow_file_info = ( file ) => {
 	const regex = /([\s\S]*?)(\!=|=)([\s\S].+|)/;
 	const m     = regex.exec( file );
 
+	/**
+	 * M Example Array
+	 * 0 -- Full
+	 * 1 -- Src File
+	 * 2 -- Operator
+	 * 3 -- Dest File
+	 */
 	if( null !== m ) {
-		core.info( JSON.stringify( m ) );
+		if( '' !== m[ 1 ] ) {
+			let src      = m[ 1 ],
+				operator = m[ 2 ],
+				dest     = m[ 3 ];
+			return {
+				src: src.trim(),
+				type: ( '!=' === operator ) ? 'once' : 'copy',
+				dest: ( '' !== dest ) ? dest.trim() : src.trim(),
+			}
+		}
+		return false;
 	}
 
 	return { src: file, dest: file, type: 'copy' };
@@ -3101,7 +3118,14 @@ async function run() {
 			let identity_status = await helper.set_git_config( local_path );
 			if( identity_status ) {
 				await helper.asyncForEach( WORKFLOW_FILES, async function( raw_workflow_file ) {
-					helper.extract_workflow_file_info( raw_workflow_file );
+					let workflow_file = helper.extract_workflow_file_info( raw_workflow_file );
+
+					if( false === workflow_file ) {
+						gh.error( `Unable To Parse ${raw_workflow_file}` );
+						return;
+					}
+
+					core.info( JSON.stringify( workflow_file ) );
 				} )
 			}
 		}
