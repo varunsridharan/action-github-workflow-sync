@@ -3024,10 +3024,8 @@ run();
 const core = __webpack_require__( 186 );
 
 function gh_env( key, _default ) {
-	if( typeof process.evn[ key ] !== 'undefined' ) {
-		return process.env[ key ];
-	}
-	return _default;
+	let value = process.evn[ key ];
+	return ( typeof value !== 'undefined' ) ? value : _default;
 }
 
 function gh_validate_env( key, message = false ) {
