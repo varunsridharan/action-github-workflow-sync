@@ -2973,8 +2973,7 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 		await exec.exec( `git clone ${common_arg} --depth 1 --branch "${branch}" ${git_url} "${local_path}"`, [], options )
 				  .then( () => toolkit.success( `Repository Branch ${branch} Cloned` ) )
 				  .catch( async( error ) => {
-					  core.warning( `auto_create_branch : ${auto_create_branch}` )
-					  if( auto_create_branch ) {
+					  if( false !== auto_create_branch ) {
 						  core.warning( `auto_create_branch : ${auto_create_branch}` )
 
 						  toolkit.warn( 'Branch Not found' );
