@@ -2929,7 +2929,7 @@ const asyncForEach = async( array, callback ) => {
 	for( let index = 0; index < array.length; index++ ) {
 		await callback( array[ index ], index, array );
 	}
-}
+};
 
 const repositoryDetails = ( input_repo ) => {
 	let GIT_TOKEN  = __webpack_require__(424).GITHUB_TOKEN;
@@ -2952,10 +2952,42 @@ const repositoryDetails = ( input_repo ) => {
 		local_path
 	}
 
+};
+
+const repositoryClone = async( git_url, branch, local_path ) => {
+	const common_arg = '--quiet --no-hardlinks --no-tags --depth 1'
+	let output       = '';
+	let error        = '';
+	const options    = {
+		listeners: {
+			stdout: ( data ) => {
+				output += data.toString();
+			},
+			stderr: ( data ) => {
+				error += data.toString();
+			}
+		},
+	};
+
+	if( 'default' === branch ) {
+		await exec.exec( `git clone ${common_arg} ${git_url} "${local_path}"`, [], options );
+		core.info( 'Output : ' );
+		core.info( output );
+		core.info( '---------------' );
+		core.info( 'error : ' );
+		core.info( error );
+		//git clone --quiet --no-hardlinks --no-tags --depth 1 $GIT_URL "${GIT_PATH}"
+	} else {
+		//git clone --quiet --no-hardlinks --no-tags --depth 1 --branch "${BRANCH}"  $GIT_URL $GIT_PATH
+	}
+	return true;
 }
-module.exports          = {
+
+
+module.exports = {
 	asyncForEach: asyncForEach,
-	repositoryDetails: repositoryDetails
+	repositoryDetails: repositoryDetails,
+	repositoryClone: repositoryClone,
 }
 
 /***/ }),
@@ -3009,6 +3041,9 @@ async function run() {
 		core.info( `	Local Path  : ${local_path}` )
 		core.endGroup();
 		core.info( '' );
+
+		await helper.repositoryClone( git_url, branch, local_path );
+		core.info( 'Success' );
 	} );
 }
 
