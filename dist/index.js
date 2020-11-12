@@ -2925,16 +2925,11 @@ module.exports = {
 /***/ 989:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const exec      = __webpack_require__( 514 );
-const { _exec } = __webpack_require__( 129 );
-const gh        = __webpack_require__( 809 );
-const core      = __webpack_require__( 186 );
+const exec = __webpack_require__( 514 );
+const gh   = __webpack_require__( 809 );
+const core = __webpack_require__( 186 );
 
-const execCmd      = function( command, workingDir ) {
-	return new Promise( ( resolve, reject ) => {
-		_exec( command, { cwd: workingDir, }, ( error, stdout ) => error ? reject( error ) : resolve( stdout.trim() ) );
-	} );
-}
+
 const asyncForEach = async( array, callback ) => {
 	for( let index = 0; index < array.length; index++ ) {
 		await callback( array[ index ], index, array );
@@ -3016,7 +3011,7 @@ const set_git_config = async( local_path ) => {
 	let status    = true;
 	core.warning( 'local_path : ' + local_path )
 	core.info( 'cmd ' + cmd )
-	await execCmd( cmd, local_path ).then( () => {
+	await gh.execCmd( cmd, local_path ).then( () => {
 		core.info( '🗃 Git Config' );
 		core.info( `	> Name  : ${GIT_USER}` );
 		core.info( `	> Email : ${GIT_EMAIL}` );
@@ -3115,7 +3110,8 @@ run();
 /***/ 809:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const core = __webpack_require__( 186 );
+const core      = __webpack_require__( 186 );
+const { _exec } = __webpack_require__( 129 );
 
 function gh_env( key, _default ) {
 	let value = process.env[ key ];
@@ -3129,8 +3125,15 @@ function gh_validate_env( key, message = false ) {
 	}
 }
 
+function execCmd( command, workingDir ) {
+	return new Promise( ( resolve, reject ) => {
+		_exec( command, { cwd: workingDir, }, ( error, stdout ) => error ? reject( error ) : resolve( stdout.trim() ) );
+	} );
+}
+
 
 module.exports = {
+	execCmd: execCmd,
 	input_bool: function( value ) {
 		return ( value === 'true' );
 	},
