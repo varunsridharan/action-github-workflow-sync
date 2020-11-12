@@ -2987,6 +2987,7 @@ async function run() {
 	core.info( `  * WORKSPACE                  : ${WORKSPACE}` );
 	core.info( `  * GITHUB_TOKEN               : ${GITHUB_TOKEN}` );
 	core.info( '-------------------------------------------------------' );
+	core.info( '' );
 
 	/**
 	 * General Config
@@ -3007,7 +3008,7 @@ async function run() {
 		core.info( `	Branch      : ${branch}` )
 		core.info( `	Local Path  : ${local_path}` )
 		core.endGroup();
-
+		core.info( '' );
 	} );
 }
 
