@@ -3027,7 +3027,7 @@ const set_git_config = async( local_path ) => {
 const extract_workflow_file_info = ( file ) => {
 	const regex = /([\s\S]*?)(!=|=)(\w.+)/s;
 	const m     = regex.exec( file );
-	core.info( JSON.stringify( file ) );
+	core.info( JSON.stringify( m ) );
 };
 
 module.exports = {
