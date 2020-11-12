@@ -2943,7 +2943,7 @@ const repositoryDetails = ( input_repo ) => {
 	let owner      = input_repo[ 0 ];
 	let repository = input_repo[ 1 ];
 	let git_url    = `https://x-access-token:${GIT_TOKEN}@github.com/${owner}/${repository}.git`;
-	let local_path = `${WORKSPACE}/${owner}/${repository}/${branch}/`;
+	let local_path = `${WORKSPACE}${owner}/${repository}/${branch}/`;
 	return {
 		owner,
 		repository,
@@ -2978,7 +2978,7 @@ async function run() {
 	let WORKSPACE              = __webpack_require__(424).WORKSPACE;
 	let REPOSITORIES           = __webpack_require__(424).REPOSITORIES;
 
-	core.info( '"-------------------------------------------------------"' );
+	core.info( '-------------------------------------------------------' );
 	core.info( '⚙️ Basic Config' );
 	core.info( `  * AUTO_CREATE_NEW_BRANCH     : ${AUTO_CREATE_NEW_BRANCH}` );
 	core.info( `  * COMMIT_EACH_FILE           : ${COMMIT_EACH_FILE}` );
@@ -2986,12 +2986,12 @@ async function run() {
 	core.info( `  * WORKFLOW_FILES_DIR         : ${WORKFLOW_FILES_DIR}` );
 	core.info( `  * WORKSPACE                  : ${WORKSPACE}` );
 	core.info( `  * GITHUB_TOKEN               : ${GITHUB_TOKEN}` );
-	core.info( '"-------------------------------------------------------"' );
+	core.info( '-------------------------------------------------------' );
 
 	/**
 	 * General Config
 	 */
-	await exec.exec( 'git config --global core.longpaths true' );
+	await exec.exec( 'git config --global core.longpaths true', [], { silent: true } );
 	await io.mkdirP( WORKSPACE );
 
 	/**
