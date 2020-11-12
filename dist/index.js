@@ -3042,11 +3042,13 @@ async function run() {
 		core.info( `	Git URL     : ${git_url}` )
 		core.info( `	Branch      : ${branch}` )
 		core.info( `	Local Path  : ${local_path}` )
-		core.endGroup();
-		core.info( '' );
+
 
 		await helper.repositoryClone( git_url, branch, local_path );
 		core.info( 'Success' );
+
+		core.endGroup();
+		core.info( '' );
 	} );
 }
 
