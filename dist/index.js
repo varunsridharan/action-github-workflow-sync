@@ -3082,7 +3082,7 @@ async function run() {
 		let status = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
 
 		if( status ) {
-			let identity_status = await helper.set_git_config();
+			let identity_status = await helper.set_git_config( local_path );
 			if( identity_status ) {
 				await helper.asyncForEach( WORKFLOW_FILES, async function( raw_workflow_file ) {
 					core.info( raw_workflow_file )
