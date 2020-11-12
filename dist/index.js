@@ -3025,7 +3025,7 @@ const set_git_config = async( local_path ) => {
 }
 
 const extract_workflow_file_info = ( file ) => {
-	const regex = /([\s\S]*?)(\!=|=)([\s\S].+)/;
+	const regex = /([\s\S]*?)(\!=|=)([\s\S].+|)/;
 	const m     = regex.exec( file );
 
 	if( null !== m ) {
