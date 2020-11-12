@@ -2925,9 +2925,9 @@ module.exports = {
 /***/ 989:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const exec    = __webpack_require__( 514 );
-const toolkit = __webpack_require__( 809 );
-const core    = __webpack_require__( 186 );
+const exec = __webpack_require__( 514 );
+const gh   = __webpack_require__( 809 );
+const core = __webpack_require__( 186 );
 
 const asyncForEach = async( array, callback ) => {
 	for( let index = 0; index < array.length; index++ ) {
@@ -2964,42 +2964,60 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 	let stauts       = true;
 	if( 'default' === branch ) {
 		await exec.exec( `git clone ${common_arg} --depth 1 ${git_url} "${local_path}"`, [], options )
-				  .then( () => toolkit.success( 'Repository Cloned' ) )
+				  .then( () => gh.success( 'Repository Cloned' ) )
 				  .catch( error => {
-					  toolkit.error( 'Repository Dose Not Exists !' )
+					  gh.error( 'Repository Dose Not Exists !' )
 					  stauts = false;
 				  } );
 	} else {
 		await exec.exec( `git clone ${common_arg} --depth 1 --branch "${branch}" ${git_url} "${local_path}"`, [], options )
-				  .then( () => toolkit.success( `Repository Branch ${branch} Cloned` ) )
+				  .then( () => gh.success( `Repository Branch ${branch} Cloned` ) )
 				  .catch( async( error ) => {
 					  if( false !== auto_create_branch ) {
 						  core.warning( `auto_create_branch : ${auto_create_branch}` )
 
-						  toolkit.warn( 'Branch Not found' );
+						  gh.warn( 'Branch Not found' );
 						  await exec.exec( `git clone ${common_arg} ${git_url} "${local_path}"`, [], options )
 									.then( async() => {
 										await exec.exec( `cd ${local_path} && git checkout -b ${branch}`, [], options )
 												  .then( () => {
-													  toolkit.success( 'Repository Cloned' )
-													  toolkit.success( 'Branch Created' )
+													  gh.success( 'Repository Cloned' )
+													  gh.success( 'Branch Created' )
+													  stauts = 'created';
 												  } )
 												  .catch( () => {
-													  toolkit.error( 'Unable To Create Branch.' )
+													  gh.error( 'Unable To Create Branch.' )
 													  stauts = false;
 												  } );
 									} )
 									.catch( error => {
-										toolkit.error( 'Repository Dose Not Exists !' )
+										gh.error( 'Repository Dose Not Exists !' )
 										stauts = false;
 									} );
 					  } else {
-						  toolkit.error( `Repository Branch ${branch} Not Found!` );
+						  gh.error( `Repository Branch ${branch} Not Found!` );
 						  stauts = false;
 					  }
 				  } );
 	}
 	return stauts;
+}
+
+const set_git_config = async( local_path ) => {
+	let GIT_EMAIL = __webpack_require__(424).GIT_EMAIL;
+	let GIT_USER  = __webpack_require__(424).GIT_USER;
+	let cmd       = `cd ${local_path} && git config user.email "${GIT_EMAIL}" &&  git config user.name "${GIT_USER}" `
+	let status    = true;
+	await exec.exec( cmd ).then( () => {
+		core.info( '🗃 Git Config' );
+		core.info( `	> Name  : ${GIT_USER}` );
+		core.info( `	> Email : ${GIT_EMAIL}` );
+		core.info( '' );
+	} ).catch( () => {
+		gh.error( 'Unable To Set GIT Identity' );
+		status = false;
+	} );
+	return status;
 }
 
 module.exports = {
@@ -3027,6 +3045,7 @@ async function run() {
 	let WORKFLOW_FILES_DIR     = __webpack_require__(424).WORKFLOW_FILES_DIR;
 	let WORKSPACE              = __webpack_require__(424).WORKSPACE;
 	let REPOSITORIES           = __webpack_require__(424).REPOSITORIES;
+	let WORKFLOW_FILES         = __webpack_require__(424).WORKFLOW_FILES;
 
 	core.info( '-------------------------------------------------------' );
 	core.info( '⚙️ Basic Config' );
@@ -3048,7 +3067,7 @@ async function run() {
 	/**
 	 * Loop Handler.
 	 */
-	helper.asyncForEach( REPOSITORIES, async function( raw_repository, index ) {
+	await helper.asyncForEach( REPOSITORIES, async function( raw_repository, index ) {
 		core.startGroup( `📓 ${raw_repository}` );
 		core.info( `${style.magenta.open}⚙️ Repository Config${style.magenta.open}` );
 		let { repository, branch, owner, git_url, local_path } = helper.repositoryDetails( raw_repository );
@@ -3060,7 +3079,16 @@ async function run() {
 
 
 		let status = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
-		core.warning( `Clone Status : ${status}` );
+
+		if( status ) {
+			let identity_status = helper.set_git_config();
+			if( identity_status ) {
+				await helper.asyncForEach( WORKFLOW_FILES, async function( raw_workflow_file ) {
+					core.info( raw_workflow_file )
+					core.info( raw_workflow_file.split( '=' ) );
+				} )
+			}
+		}
 
 		core.endGroup();
 		core.info( '' );
@@ -3093,6 +3121,9 @@ function gh_validate_env( key, message = false ) {
 
 
 module.exports = {
+	input_bool: function( value ) {
+		return ( value === 'true' );
+	},
 	env: gh_env,
 	validate_env: gh_validate_env,
 	success: function( message ) {
@@ -3115,9 +3146,10 @@ const core = __webpack_require__( 186 );
 const path = __webpack_require__( 622 );
 const gh   = __webpack_require__( 809 );
 
-const AUTO_CREATE_NEW_BRANCH = core.getInput( 'AUTO_CREATE_NEW_BRANCH' );
-const COMMIT_EACH_FILE       = core.getInput( 'COMMIT_EACH_FILE' );
-const DRY_RUN                = core.getInput( 'DRY_RUN' );
+
+const AUTO_CREATE_NEW_BRANCH = gh.input_bool( core.getInput( 'AUTO_CREATE_NEW_BRANCH' ) );
+const COMMIT_EACH_FILE       = gh.input_bool( core.getInput( 'COMMIT_EACH_FILE' ) );
+const DRY_RUN                = gh.input_bool( core.getInput( 'DRY_RUN' ) );
 const GITHUB_TOKEN           = core.getInput( 'GITHUB_TOKEN' );
 const RAW_REPOSITORIES       = core.getInput( 'REPOSITORIES' );
 const RAW_WORKFLOW_FILES     = core.getInput( 'WORKFLOW_FILES' );
@@ -3128,7 +3160,9 @@ const GITHUB_WORKSPACE       = gh.env( 'GITHUB_WORKSPACE' );
 const WORKSPACE              = path.dirname( path.dirname( GITHUB_WORKSPACE ) ) + '/workflow-sync/';
 
 module.exports = {
-	AUTO_CREATE_NEW_BRANCH: ( 'false' === AUTO_CREATE_NEW_BRANCH ) ? false : true,
+	GIT_USER: 'Github Actions Workflow Sync Bot',
+	GIT_EMAIL: 'githubactionbot+workflowsync@gmail.com',
+	AUTO_CREATE_NEW_BRANCH,
 	COMMIT_EACH_FILE,
 	DRY_RUN,
 	GITHUB_TOKEN,
