@@ -418,7 +418,6 @@ async function run() {
 	core.info( `  * $rawrepositories               : ${$rawrepositories}` );
 	core.info( `  * $rawworkflowfiles               : ${$rawworkflowfiles}` );
 	core.info( `  * $workflowsdir               : ${$workflowsdir}` );
-
 	core.info( '"-------------------------------------------------------"' );
 }
 
