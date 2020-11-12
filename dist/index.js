@@ -3006,9 +3006,9 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 const set_git_config = async( local_path ) => {
 	let GIT_EMAIL = __webpack_require__(424).GIT_EMAIL;
 	let GIT_USER  = __webpack_require__(424).GIT_USER;
-	let cmd       = `cd ${local_path} && git config user.email "${GIT_EMAIL}" &&  git config user.name "${GIT_USER}" `
+	let cmd       = `git config user.email "${GIT_EMAIL}" &&  git config user.name "${GIT_USER}" `
 	let status    = true;
-	await exec.exec( cmd ).then( () => {
+	await exec.exec( cmd, [], { cwd: local_path } ).then( () => {
 		core.info( '🗃 Git Config' );
 		core.info( `	> Name  : ${GIT_USER}` );
 		core.info( `	> Email : ${GIT_EMAIL}` );
