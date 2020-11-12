@@ -3010,6 +3010,7 @@ const set_git_config = async( local_path ) => {
 	let cmd       = `git config --local user.name "${GIT_USER}" && git config --local user.email "${GIT_EMAIL}"`;
 	let status    = true;
 	await gh.execCmd( cmd, local_path ).then( () => {
+		core.info( '' );
 		core.info( '🗃 Git Config' );
 		core.info( `	> Name  : ${GIT_USER}` );
 		core.info( `	> Email : ${GIT_EMAIL}` );
@@ -3155,7 +3156,6 @@ async function run() {
 		core.info( `	Branch      : ${branch}` )
 		core.info( `	Local Path  : ${local_path}` )
 
-
 		let status = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
 
 		if( status ) {
@@ -3170,7 +3170,8 @@ async function run() {
 						return;
 					}
 
-					await helper.source_file_location( WORKFLOW_FILES_DIR, owner, repository, workflow_file.src );
+					let file_data = await helper.source_file_location( WORKFLOW_FILES_DIR, owner, repository, workflow_file.src );
+					core.info( JSON.stringify( file_data ) );
 				} )
 			}
 		}
