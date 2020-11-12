@@ -2925,9 +2925,9 @@ module.exports = {
 /***/ 989:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const exec = __webpack_require__( 514 );
-
-const core = __webpack_require__( 186 );
+const exec    = __webpack_require__( 514 );
+const toolkit = __webpack_require__( 809 );
+const core    = __webpack_require__( 186 );
 
 const asyncForEach = async( array, callback ) => {
 	for( let index = 0; index < array.length; index++ ) {
@@ -2958,29 +2958,36 @@ const repositoryDetails = ( input_repo ) => {
 
 };
 
-const repositoryClone = async( git_url, branch, local_path ) => {
-	const common_arg = '--quiet --no-hardlinks --no-tags --depth 1'
-	let output       = '';
-	let error        = '';
-	const options    = {
-		silent: true,
-		listeners: {
-			stdout: ( data ) => {
-				output += data.toString();
-			},
-			stderr: ( data ) => {
-				error += data.toString();
-			}
-		},
-	};
+const repositoryClone = async( git_url, local_path, branch, auto_create_branch ) => {
+	const common_arg = '--quiet --no-hardlinks --no-tags'
+	const options    = { silent: true };
 
 	if( 'default' === branch ) {
-		await exec.exec( `git clone ${common_arg} ${git_url} "${local_path}"`, [], options ).catch( error => {
-			core.error( 'Repository Dose Not Exists !' )
+		await exec.exec( `git clone ${common_arg} --depth 1 ${git_url} "${local_path}"`, [], options ).catch( error => {
+			toolkit.error( 'Repository Dose Not Exists !' )
 		} );
-		//git clone --quiet --no-hardlinks --no-tags --depth 1 $GIT_URL "${GIT_PATH}"
 	} else {
-		//git clone --quiet --no-hardlinks --no-tags --depth 1 --branch "${BRANCH}"  $GIT_URL $GIT_PATH
+		await exec.exec( `git clone ${common_arg} --depth 1 --branch "${branch}" ${git_url} "${local_path}"` )
+				  .catch( async( error ) => {
+					  if( auto_create_branch ) {
+						  toolkit.warn( 'Branch Not found' );
+						  await exec.exec( `git clone ${common_arg} ${git_url} "${local_path}"`, [], options )
+									.then( async() => {
+										await exec.exec( `cd ${local_path} && git checkout -b ${branch}` )
+												  .then( () => {
+													  toolkit.success( 'Branch Created' );
+												  } )
+												  .catch( () => {
+													  toolkit.error( 'Unable To Create Branch.' );
+												  } );
+									} )
+									.catch( error => {
+										toolkit.error( 'Repository Dose Not Exists !' );
+									} );
+					  } else {
+						  toolkit.error( `Repository Branch ${branch} Not Found!` );
+					  }
+				  } );
 	}
 }
 
@@ -3041,7 +3048,7 @@ async function run() {
 		core.info( `	Local Path  : ${local_path}` )
 
 
-		await helper.repositoryClone( git_url, branch, local_path );
+		await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
 		core.info( 'Success' );
 
 		core.endGroup();
@@ -3077,6 +3084,15 @@ function gh_validate_env( key, message = false ) {
 module.exports = {
 	env: gh_env,
 	validate_env: gh_validate_env,
+	success: function( message ) {
+		core.info( `✔️ ${message}` );
+	},
+	warn: function( message ) {
+		core.info( `⚠️ ${message}` );
+	},
+	error: function( message ) {
+		core.error( `🛑  ${message}` );
+	}
 };
 
 /***/ }),
