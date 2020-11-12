@@ -3012,7 +3012,7 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 const set_git_config = async( local_path ) => {
 	let GIT_EMAIL = __webpack_require__(424).GIT_EMAIL;
 	let GIT_USER  = __webpack_require__(424).GIT_USER;
-	let cmd       = `git config --global user.name ""${GIT_USER}"" && git config --global user.email ""${GIT_EMAIL}""`;
+	let cmd       = `git config --local user.name "${GIT_USER}" && git config --local user.email "${GIT_EMAIL}"`;
 	let status    = true;
 	core.warning( 'local_path : ' + local_path )
 	core.info( 'cmd ' + cmd )
