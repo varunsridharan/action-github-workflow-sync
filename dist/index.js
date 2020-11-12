@@ -2962,7 +2962,6 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 	const common_arg = '--quiet --no-hardlinks --no-tags'
 	const options    = { silent: true };
 	let stauts       = true;
-	core.warning( `auto_create_branch : ${auto_create_branch}` )
 	if( 'default' === branch ) {
 		await exec.exec( `git clone ${common_arg} --depth 1 ${git_url} "${local_path}"`, [], options )
 				  .then( () => toolkit.success( 'Repository Cloned' ) )
@@ -2974,7 +2973,10 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 		await exec.exec( `git clone ${common_arg} --depth 1 --branch "${branch}" ${git_url} "${local_path}"`, [], options )
 				  .then( () => toolkit.success( `Repository Branch ${branch} Cloned` ) )
 				  .catch( async( error ) => {
+					  core.warning( `auto_create_branch : ${auto_create_branch}` )
 					  if( auto_create_branch ) {
+						  core.warning( `auto_create_branch : ${auto_create_branch}` )
+
 						  toolkit.warn( 'Branch Not found' );
 						  await exec.exec( `git clone ${common_arg} ${git_url} "${local_path}"`, [], options )
 									.then( async() => {
