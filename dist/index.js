@@ -2928,7 +2928,7 @@ module.exports = {
 const exec = __webpack_require__( 514 );
 const gh   = __webpack_require__( 809 );
 const core = __webpack_require__( 186 );
-
+const fs   = __webpack_require__( 747 );
 
 const asyncForEach = async( array, callback ) => {
 	for( let index = 0; index < array.length; index++ ) {
@@ -3024,7 +3024,7 @@ const set_git_config = async( local_path ) => {
 	return status;
 }
 
-const extract_workflow_file_info = ( file ) => {
+const extract_workflow_file_info = async( file ) => {
 	const regex = /([\s\S]*?)(\!=|=)([\s\S].+|)/;
 	const m     = regex.exec( file );
 
@@ -3042,8 +3042,8 @@ const extract_workflow_file_info = ( file ) => {
 				dest     = m[ 3 ];
 			return {
 				src: src.trim(),
-				type: ( '!=' === operator ) ? 'once' : 'copy',
 				dest: ( '' !== dest ) ? dest.trim() : src.trim(),
+				type: ( '!=' === operator ) ? 'once' : 'copy',
 			}
 		}
 		return false;
@@ -3052,11 +3052,57 @@ const extract_workflow_file_info = ( file ) => {
 	return { src: file, dest: file, type: 'copy' };
 };
 
+const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSITORY_ID, SRC_FILE ) => {
+	let GITHUB_WORKSPACE = __webpack_require__(424).GITHUB_WORKSPACE,
+		workflows_files  = [
+			`${REPOSITORY_ID}/workflows/${SRC_FILE}`,
+			`${REPOSITORY_OWNER}/workflows/${SRC_FILE}`,
+			`${WORKFLOW_FILES_DIR}/${SRC_FILE}`,
+			`.github/workflows/${SRC_FILE}`,
+		],
+		general_files    = [
+			`${REPOSITORY_ID}/${SRC_FILE}`,
+			`${REPOSITORY_OWNER}/${SRC_FILE}`,
+			`${SRC_FILE}`
+		];
+	let _return          = false;
+	await asyncForEach( workflows_files, async( LOCATION ) => {
+		if( fs.existsSync( `${GITHUB_WORKSPACE}/${LOCATION}` ) && false === _return ) {
+			_return = {
+				path: `${GITHUB_WORKSPACE}/${LOCATION}`,
+				relative_path: `${LOCATION}`,
+				dest_type: 'workflow',
+			}
+			core.info( `✅  ${GITHUB_WORKSPACE}/${LOCATION}` );
+		} else {
+			core.info( `🛑  ${GITHUB_WORKSPACE}/${LOCATION}` );
+		}
+	} );
+
+	if( false === _return ) {
+		await asyncForEach( general_files, async( LOCATION ) => {
+			if( fs.existsSync( `${GITHUB_WORKSPACE}/${LOCATION}` ) && false === _return ) {
+				_return = {
+					path: `${GITHUB_WORKSPACE}/${LOCATION}`,
+					relative_path: `${LOCATION}`,
+					dest_type: false,
+				}
+				core.info( `✅  ${GITHUB_WORKSPACE}/${LOCATION}` );
+			} else {
+				core.info( `🛑  ${GITHUB_WORKSPACE}/${LOCATION}` );
+			}
+		} );
+	}
+
+	return _return;
+}
+
 module.exports = {
 	asyncForEach: asyncForEach,
 	repositoryDetails: repositoryDetails,
 	repositoryClone: repositoryClone,
 	set_git_config: set_git_config,
+	source_file_location: source_file_location,
 	extract_workflow_file_info: extract_workflow_file_info,
 };
 
@@ -3126,6 +3172,7 @@ async function run() {
 					}
 
 					core.info( JSON.stringify( workflow_file ) );
+					await helper.source_file_location( WORKFLOW_FILES_DIR, owner, repository, workflow_file.src );
 				} )
 			}
 		}
