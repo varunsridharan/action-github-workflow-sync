@@ -2961,34 +2961,40 @@ const repositoryDetails = ( input_repo ) => {
 const repositoryClone = async( git_url, local_path, branch, auto_create_branch ) => {
 	const common_arg = '--quiet --no-hardlinks --no-tags'
 	const options    = { silent: true };
-
+	let stauts       = true;
 	if( 'default' === branch ) {
-		await exec.exec( `git clone ${common_arg} --depth 1 ${git_url} "${local_path}"`, [], options ).catch( error => {
-			toolkit.error( 'Repository Dose Not Exists !' )
-		} );
+		let clone = await exec.exec( `git clone ${common_arg} --depth 1 ${git_url} "${local_path}"`, [], options );
+		clone.then( () => toolkit.success( 'Repository Cloned' ) )
+			 .catch( error => {
+				 toolkit.error( 'Repository Dose Not Exists !' )
+				 stauts = false;
+			 } );
 	} else {
-		await exec.exec( `git clone ${common_arg} --depth 1 --branch "${branch}" ${git_url} "${local_path}"` )
-				  .catch( async( error ) => {
-					  if( auto_create_branch ) {
-						  toolkit.warn( 'Branch Not found' );
-						  await exec.exec( `git clone ${common_arg} ${git_url} "${local_path}"`, [], options )
-									.then( async() => {
-										await exec.exec( `cd ${local_path} && git checkout -b ${branch}` )
-												  .then( () => {
-													  toolkit.success( 'Branch Created' );
-												  } )
-												  .catch( () => {
-													  toolkit.error( 'Unable To Create Branch.' );
-												  } );
-									} )
-									.catch( error => {
-										toolkit.error( 'Repository Dose Not Exists !' );
-									} );
-					  } else {
-						  toolkit.error( `Repository Branch ${branch} Not Found!` );
-					  }
-				  } );
+		let clone = await exec.exec( `git clone ${common_arg} --depth 1 --branch "${branch}" ${git_url} "${local_path}"`, [], options );
+		clone.catch( async( error ) => {
+			if( auto_create_branch ) {
+				toolkit.warn( 'Branch Not found' );
+				let autocreate = await exec.exec( `git clone ${common_arg} ${git_url} "${local_path}"`, [], options );
+				autocreate.then( async() => {
+					let trycreate = await exec.exec( `cd ${local_path} && git checkout -b ${branch}`, [], options );
+					trycreate.then( () => {
+						toolkit.success( 'Repository Cloned' )
+						toolkit.success( 'Branch Created' )
+					} ).catch( () => {
+						toolkit.error( 'Unable To Create Branch.' )
+						stauts = false;
+					} );
+				} ).catch( error => {
+					toolkit.error( 'Repository Dose Not Exists !' )
+					stauts = false;
+				} );
+			} else {
+				toolkit.error( `Repository Branch ${branch} Not Found!` );
+				stauts = false;
+			}
+		} );
 	}
+	return stauts;
 }
 
 module.exports = {
@@ -3048,8 +3054,8 @@ async function run() {
 		core.info( `	Local Path  : ${local_path}` )
 
 
-		await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
-		core.info( 'Success' );
+		let status = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
+		core.warning( `Clone Status : ${status}` );
 
 		core.endGroup();
 		core.info( '' );
