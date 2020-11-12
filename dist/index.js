@@ -3050,16 +3050,16 @@ const extract_workflow_file_info = ( file ) => {
 	return { src: file, dest: file, type: 'copy' };
 };
 
-const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSITORY_ID, SRC_FILE ) => {
+const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSITORY_NAME, SRC_FILE ) => {
 	let GITHUB_WORKSPACE = __webpack_require__(424).GITHUB_WORKSPACE,
 		workflows_files  = [
-			`${REPOSITORY_ID}/workflows/${SRC_FILE}`,
+			`${REPOSITORY_OWNER}/${REPOSITORY_NAME}/workflows/${SRC_FILE}`,
 			`${REPOSITORY_OWNER}/workflows/${SRC_FILE}`,
 			`${WORKFLOW_FILES_DIR}/${SRC_FILE}`,
 			`.github/workflows/${SRC_FILE}`,
 		],
 		general_files    = [
-			`${REPOSITORY_ID}/${SRC_FILE}`,
+			`${REPOSITORY_OWNER}/${REPOSITORY_NAME}/${SRC_FILE}`,
 			`${REPOSITORY_OWNER}/${SRC_FILE}`,
 			`${SRC_FILE}`
 		];
