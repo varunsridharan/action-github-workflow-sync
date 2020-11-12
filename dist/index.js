@@ -3008,6 +3008,8 @@ const set_git_config = async( local_path ) => {
 	let GIT_USER  = __webpack_require__(424).GIT_USER;
 	let cmd       = `git config --local user.name \"${GIT_USER}\" && git config --local user.email \"${GIT_EMAIL}\"`;
 	let status    = true;
+	core.warning( 'local_path : ' + local_path )
+	core.info( 'cmd ' + cmd )
 	await exec.exec( cmd, [], { cwd: local_path } ).then( () => {
 		core.info( '🗃 Git Config' );
 		core.info( `	> Name  : ${GIT_USER}` );
