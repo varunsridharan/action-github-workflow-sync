@@ -3024,11 +3024,18 @@ const set_git_config = async( local_path ) => {
 	return status;
 }
 
+const extract_workflow_file_info = ( file ) => {
+	const regex = /([\s\S]*?)(!=|=)(\w.+)/s;
+	const m     = regex.exec( file );
+	core.info( JSON.stringify( file ) );
+};
+
 module.exports = {
 	asyncForEach: asyncForEach,
 	repositoryDetails: repositoryDetails,
 	repositoryClone: repositoryClone,
 	set_git_config: set_git_config,
+	extract_workflow_file_info: extract_workflow_file_info,
 };
 
 /***/ }),
@@ -3089,8 +3096,7 @@ async function run() {
 			let identity_status = await helper.set_git_config( local_path );
 			if( identity_status ) {
 				await helper.asyncForEach( WORKFLOW_FILES, async function( raw_workflow_file ) {
-					core.info( raw_workflow_file )
-					core.info( raw_workflow_file.split( '=' ) );
+					helper.extract_workflow_file_info( raw_workflow_file );
 				} )
 			}
 		}
