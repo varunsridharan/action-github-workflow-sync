@@ -3024,6 +3024,7 @@ module.exports = {
 	asyncForEach: asyncForEach,
 	repositoryDetails: repositoryDetails,
 	repositoryClone: repositoryClone,
+	set_git_config: set_git_config,
 };
 
 /***/ }),
