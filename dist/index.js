@@ -2927,6 +2927,8 @@ module.exports = {
 
 const exec = __webpack_require__( 514 );
 
+const core = __webpack_require__( 186 );
+
 const asyncForEach = async( array, callback ) => {
 	for( let index = 0; index < array.length; index++ ) {
 		await callback( array[ index ], index, array );
@@ -2985,12 +2987,11 @@ const repositoryClone = async( git_url, branch, local_path ) => {
 	return true;
 }
 
-
 module.exports = {
 	asyncForEach: asyncForEach,
 	repositoryDetails: repositoryDetails,
 	repositoryClone: repositoryClone,
-}
+};
 
 /***/ }),
 
