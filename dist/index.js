@@ -408,7 +408,7 @@ async function run() {
 	let RAW_REPOSITORIES       = __webpack_require__(229).RAW_REPOSITORIES;
 	let RAW_WORKFLOW_FILES     = __webpack_require__(229).RAW_WORKFLOW_FILES;
 	let WORKFLOW_FILES_DIR     = __webpack_require__(229).WORKFLOW_FILES_DIR;
-	let REPOSITORIES           = __webpack_require__(229).REPOSITORIES;
+	let REPOSITORIES           = JSON.stringify( __webpack_require__(229).REPOSITORIES );
 	let WORKFLOW_FILES         = __webpack_require__(229).WORKFLOW_FILES;
 
 	core.info( '"-------------------------------------------------------"' );
