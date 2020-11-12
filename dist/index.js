@@ -3024,7 +3024,7 @@ run();
 const core = __webpack_require__( 186 );
 
 function gh_env( key, _default ) {
-	let value = process.evn[ key ];
+	let value = process.env[ key ];
 	return ( typeof value !== 'undefined' ) ? value : _default;
 }
 
