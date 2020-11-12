@@ -2963,6 +2963,7 @@ const repositoryClone = async( git_url, branch, local_path ) => {
 	let output       = '';
 	let error        = '';
 	const options    = {
+		silent: true,
 		listeners: {
 			stdout: ( data ) => {
 				output += data.toString();
@@ -2974,17 +2975,13 @@ const repositoryClone = async( git_url, branch, local_path ) => {
 	};
 
 	if( 'default' === branch ) {
-		await exec.exec( `git clone ${common_arg} ${git_url} "${local_path}"`, [], options );
-		core.info( 'Output : ' );
-		core.info( output );
-		core.info( '---------------' );
-		core.info( 'error : ' );
-		core.info( error );
+		await exec.exec( `git clone ${common_arg} ${git_url} "${local_path}"`, [], options ).catch( error => {
+			core.error( 'Repository Dose Not Exists !' )
+		} );
 		//git clone --quiet --no-hardlinks --no-tags --depth 1 $GIT_URL "${GIT_PATH}"
 	} else {
 		//git clone --quiet --no-hardlinks --no-tags --depth 1 --branch "${BRANCH}"  $GIT_URL $GIT_PATH
 	}
-	return true;
 }
 
 module.exports = {
