@@ -401,23 +401,27 @@ exports.toCommandValue = toCommandValue;
 const core = __webpack_require__( 186 );
 
 async function run() {
-	let $autobranch       = __webpack_require__( 609 );
-	let $commiteachfile   = __webpack_require__( 741 );
-	let $dryrun           = __webpack_require__( 4 );
-	let $githubtoken      = __webpack_require__( 222 );
-	let $rawrepositories  = __webpack_require__( 875 );
-	let $rawworkflowfiles = __webpack_require__( 611 );
-	let $workflowsdir     = __webpack_require__( 442 );
+	let AUTO_CREATE_NEW_BRANCH = __webpack_require__(229).AUTO_CREATE_NEW_BRANCH;
+	let COMMIT_EACH_FILE       = __webpack_require__(229).COMMIT_EACH_FILE;
+	let DRY_RUN                = __webpack_require__(229).DRY_RUN;
+	let GITHUB_TOKEN           = __webpack_require__(229).GITHUB_TOKEN;
+	let RAW_REPOSITORIES       = __webpack_require__(229).RAW_REPOSITORIES;
+	let RAW_WORKFLOW_FILES     = __webpack_require__(229).RAW_WORKFLOW_FILES;
+	let WORKFLOW_FILES_DIR     = __webpack_require__(229).WORKFLOW_FILES_DIR;
+	let REPOSITORIES           = __webpack_require__(229).REPOSITORIES;
+	let WORKFLOW_FILES         = __webpack_require__(229).WORKFLOW_FILES;
 
 	core.info( '"-------------------------------------------------------"' );
 	core.info( '⚙️ Basic Config' );
-	core.info( `  * $autobranch               : ${$autobranch}` );
-	core.info( `  * $commiteachfile               : ${$commiteachfile}` );
-	core.info( `  * $dryrun               : ${$dryrun}` );
-	core.info( `  * $githubtoken               : ${$githubtoken}` );
-	core.info( `  * $rawrepositories               : ${$rawrepositories}` );
-	core.info( `  * $rawworkflowfiles               : ${$rawworkflowfiles}` );
-	core.info( `  * $workflowsdir               : ${$workflowsdir}` );
+	core.info( `  * AUTO_CREATE_NEW_BRANCH     : ${AUTO_CREATE_NEW_BRANCH}` );
+	core.info( `  * COMMIT_EACH_FILE           : ${COMMIT_EACH_FILE}` );
+	core.info( `  * DRY_RUN                    : ${DRY_RUN}` );
+	core.info( `  * RAW_REPOSITORIES           : ${RAW_REPOSITORIES}` );
+	core.info( `  * RAW_WORKFLOW_FILES         : ${RAW_WORKFLOW_FILES}` );
+	core.info( `  * WORKFLOW_FILES_DIR         : ${WORKFLOW_FILES_DIR}` );
+	core.info( `  * REPOSITORIES               : ${REPOSITORIES}` );
+	core.info( `  * WORKFLOW_FILES             : ${WORKFLOW_FILES}` );
+
 	core.info( '"-------------------------------------------------------"' );
 }
 
@@ -428,66 +432,32 @@ run();
 
 /***/ }),
 
-/***/ 609:
+/***/ 229:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const core = __webpack_require__( 186 );
 
-module.exports = core.getInput( 'AUTO_CREATE_NEW_BRANCH' );
+const AUTO_CREATE_NEW_BRANCH = core.getInput( 'AUTO_CREATE_NEW_BRANCH' );
+const COMMIT_EACH_FILE       = core.getInput( 'COMMIT_EACH_FILE' );
+const DRY_RUN                = core.getInput( 'DRY_RUN' );
+const GITHUB_TOKEN           = core.getInput( 'GITHUB_TOKEN' );
+const RAW_REPOSITORIES       = core.getInput( 'REPOSITORIES' );
+const RAW_WORKFLOW_FILES     = core.getInput( 'WORKFLOW_FILES' );
+const WORKFLOW_FILES_DIR     = core.getInput( 'WORKFLOW_FILES_DIR' );
+const REPOSITORIES           = RAW_REPOSITORIES.split( '\n' );
+const WORKFLOW_FILES         = RAW_WORKFLOW_FILES.split( '\n' );
 
-/***/ }),
-
-/***/ 741:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const core = __webpack_require__( 186 );
-
-module.exports = core.getInput( 'COMMIT_EACH_FILE' );
-
-/***/ }),
-
-/***/ 4:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const core = __webpack_require__( 186 );
-
-module.exports = core.getInput( 'DRY_RUN' );
-
-/***/ }),
-
-/***/ 222:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const core = __webpack_require__( 186 );
-
-module.exports = core.getInput( 'GITHUB_TOKEN' );
-
-/***/ }),
-
-/***/ 875:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const core = __webpack_require__( 186 );
-
-module.exports = core.getInput( 'REPOSITORIES' );
-
-/***/ }),
-
-/***/ 611:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const core = __webpack_require__( 186 );
-
-module.exports = core.getInput( 'WORKFLOW_FILES' );
-
-/***/ }),
-
-/***/ 442:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const core = __webpack_require__( 186 );
-
-module.exports = core.getInput( 'WORKFLOW_FILES_DIR' );
+module.exports = {
+	AUTO_CREATE_NEW_BRANCH,
+	COMMIT_EACH_FILE,
+	DRY_RUN,
+	GITHUB_TOKEN,
+	RAW_REPOSITORIES,
+	RAW_WORKFLOW_FILES,
+	WORKFLOW_FILES_DIR,
+	REPOSITORIES,
+	WORKFLOW_FILES,
+}
 
 /***/ }),
 
