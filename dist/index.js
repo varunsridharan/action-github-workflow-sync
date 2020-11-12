@@ -3171,7 +3171,13 @@ async function run() {
 					}
 
 					let file_data = await helper.source_file_location( WORKFLOW_FILES_DIR, owner, repository, workflow_file.src );
+					if( false === file_data ) {
+						gh.error( 'Unable To Find Source File !' );
+						return;
+					}
+
 					core.info( JSON.stringify( file_data ) );
+
 				} )
 			}
 		}
