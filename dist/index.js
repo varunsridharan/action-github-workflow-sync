@@ -3197,9 +3197,9 @@ module.exports = {
 const core    = __webpack_require__( 186 );
 const exec    = __webpack_require__( 514 );
 const io      = __webpack_require__( 436 );
-const helper  = __webpack_require__( 989 );
 const style   = __webpack_require__( 68 );
 const toolkit = __webpack_require__( 338 );
+const helper  = __webpack_require__( 989 );
 
 async function run() {
 	let AUTO_CREATE_NEW_BRANCH = __webpack_require__(424).AUTO_CREATE_NEW_BRANCH;
@@ -3298,8 +3298,9 @@ run();
 /***/ 424:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const core                   = __webpack_require__( 186 );
-const toolkit                = __webpack_require__( 338 );
+const core    = __webpack_require__( 186 );
+const toolkit = __webpack_require__( 338 );
+core.info( toolkit );
 const AUTO_CREATE_NEW_BRANCH = toolkit.input.tobool( core.getInput( 'AUTO_CREATE_NEW_BRANCH' ) );
 const COMMIT_EACH_FILE       = toolkit.input.tobool( core.getInput( 'COMMIT_EACH_FILE' ) );
 const DRY_RUN                = toolkit.input.tobool( core.getInput( 'DRY_RUN' ) );
