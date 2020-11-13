@@ -3038,12 +3038,6 @@ const fs      = __webpack_require__( 747 );
 const path    = __webpack_require__( 622 );
 const toolkit = __webpack_require__( 338 );
 
-const asyncForEach = async( array, callback ) => {
-	for( let index = 0; index < array.length; index++ ) {
-		await callback( array[ index ], index, array );
-	}
-};
-
 const repositoryDetails = ( input_repo ) => {
 	let GIT_TOKEN  = __webpack_require__(424).GITHUB_TOKEN;
 	let WORKSPACE  = __webpack_require__(424).WORKSPACE;
@@ -3318,7 +3312,7 @@ const gh_validate_env = ( key, message = false ) => {
 		message = ( '' === message || false === message ) ? `🚩  ${key} Not Found. Please Set It As ENV Variable` : message;
 		core.setFailed( message );
 	}
-}
+};
 const execCmd         = ( command, workingDir ) => new Promise( ( resolve, reject ) => {
 	exec( command, { cwd: workingDir, }, ( error, stdout ) => error ? reject( error ) : resolve( stdout.trim() ) );
 } );
@@ -3335,7 +3329,7 @@ const fix_path        = ( $path ) => {
 
 	}
 	return $path;
-}
+};
 const git_add         = async( GIT_PATH, GIT_USER, GIT_EMAIL, LOG = true ) => {
 	let status = true;
 	let cmd    = `git config --local user.name "${GIT_USER}" && git config --local user.email "${GIT_EMAIL}"`;
@@ -3353,7 +3347,7 @@ const git_add         = async( GIT_PATH, GIT_USER, GIT_EMAIL, LOG = true ) => {
 		status = false;
 	} );
 	return status;
-}
+};
 
 module.exports = {
 	git_add: git_add,
