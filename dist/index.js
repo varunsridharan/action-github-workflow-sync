@@ -3244,28 +3244,24 @@ module.exports = {
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const exec    = __webpack_require__( 514 );
-const core    = __webpack_require__( 186 );
 const toolkit = __webpack_require__( 338 );
 
 const repositoryDetails = ( input_repo ) => {
-	let GIT_TOKEN  = __webpack_require__(424).GITHUB_TOKEN;
-	let WORKSPACE  = __webpack_require__(424).WORKSPACE;
-	input_repo     = input_repo.split( '@' );
+	let GIT_TOKEN = __webpack_require__(424).GITHUB_TOKEN;
+	let WORKSPACE = __webpack_require__(424).WORKSPACE;
+	input_repo    = input_repo.split( '@' );
+
 	// Extract Branch Info varunsridharan/demo@master
-	let branch     = ( typeof input_repo[ 1 ] !== 'undefined' ) ? input_repo[ 1 ] : false;
-	branch         = ( false === branch || '' === branch ) ? 'default' : branch;
-	input_repo     = input_repo[ 0 ].split( '/' );
-	// Extracts Repository Info varunsridharan , demo
-	let owner      = input_repo[ 0 ];
-	let repository = input_repo[ 1 ];
-	let git_url    = `https://x-access-token:${GIT_TOKEN}@github.com/${owner}/${repository}.git`;
-	let local_path = `${WORKSPACE}${owner}/${repository}/${branch}/`;
+	let branch    = ( typeof input_repo[ 1 ] !== 'undefined' ) ? input_repo[ 1 ] : false;
+	branch        = ( false === branch || '' === branch ) ? 'default' : branch;
+	input_repo    = input_repo[ 0 ].split( '/' );
+
 	return {
-		owner,
-		repository,
-		git_url,
+		owner: input_repo[ 0 ],
+		repository: input_repo[ 1 ],
+		git_url: `https://x-access-token:${GIT_TOKEN}@github.com/${input_repo[ 0 ]}/${input_repo[ 1 ]}.git`,
 		branch,
-		local_path
+		local_path: `${WORKSPACE}${input_repo[ 0 ]}/${input_repo[ 1 ]}/${branch}/`
 	};
 };
 
@@ -3311,8 +3307,6 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 	}
 	return stauts;
 };
-
-const set_git_config = async( local_path ) => await toolkit.git.identity( local_path, __webpack_require__(424).GIT_USER, __webpack_require__(424).GIT_EMAIL, true );
 
 const extract_workflow_file_info = ( file ) => {
 	const regex = /([\s\S]*?)(\!=|=)([\s\S].+|)/;
@@ -3391,10 +3385,15 @@ const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSI
 	return _return;
 };
 
+const commitfile = async( local_path ) => {
+	let message = `💬 - Files Synced | Github Action Runner : ${toolkit.input.env( 'GITHUB_RUN_NUMBER' )} | ⚡ Triggered By ${toolkit.input.env( 'GITHUB_REPOSITORY' )}@${toolkit.input.env( 'GITHUB_SHA' )}`;
+	return await toolkit.git.commit( local_path, message );
+};
+
 module.exports = {
+	commitfile: commitfile,
 	repositoryDetails: repositoryDetails,
 	repositoryClone: repositoryClone,
-	set_git_config: set_git_config,
 	source_file_location: source_file_location,
 	extract_workflow_file_info: extract_workflow_file_info,
 };
@@ -3407,7 +3406,6 @@ module.exports = {
 const core    = __webpack_require__( 186 );
 const exec    = __webpack_require__( 514 );
 const io      = __webpack_require__( 436 );
-const style   = __webpack_require__( 68 );
 const toolkit = __webpack_require__( 338 );
 const helper  = __webpack_require__( 989 );
 
@@ -3443,7 +3441,7 @@ async function run() {
 	 */
 	await toolkit.asyncForEach( REPOSITORIES, async function( raw_repository ) {
 		core.startGroup( `📓 ${raw_repository}` );
-		toolkit.log( `${style.magenta.open}⚙️ Repository Config${style.magenta.close}` );
+		toolkit.log.magenta( `⚙️ Repository Config` );
 		let { repository, branch, owner, git_url, local_path } = helper.repositoryDetails( raw_repository );
 		toolkit.log( `	Slug        : ${repository}` );
 		toolkit.log( `	Owner       : ${owner}` );
@@ -3454,14 +3452,15 @@ async function run() {
 		let status = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
 
 		if( status ) {
-			let identity_status = await helper.set_git_config( local_path );
+			let identity_status = await toolkit.git.identity( local_path, __webpack_require__(424).GIT_USER, __webpack_require__(424).GIT_EMAIL, true );
 			if( identity_status ) {
 				await toolkit.asyncForEach( WORKFLOW_FILES, async function( raw_workflow_file ) {
-					toolkit.log( `${style.cyan.open}${raw_workflow_file}${style.cyan.close}` );
+					toolkit.log.cyan( `${raw_workflow_file}` );
+
 					let workflow_file = helper.extract_workflow_file_info( raw_workflow_file );
 
 					if( false === workflow_file ) {
-						toolkit.log.error( `	Unable To Parse ${raw_workflow_file}` );
+						toolkit.log.error( `Unable To Parse ${raw_workflow_file}`, '	' );
 						return;
 					}
 
@@ -3474,39 +3473,54 @@ async function run() {
 
 					const { path, relative_path, dest_type, is_dir } = file_data;
 
-					if( 'workflow' === dest_type ) {
-						workflow_file.dest = `.github/workflows/${workflow_file.dest}`;
-					}
+					workflow_file.dest = ( 'workflow' === dest_type ) ? `.github/workflows/${workflow_file.dest}` : workflow_file.dest;
 
 					toolkit.log.success( `${relative_path} => ${workflow_file.dest}`, '	' );
 
-					let cp_options = {};
-
-					if( is_dir ) {
-						cp_options = { recursive: true, force: true };
-					}
-
-					let iscopied = true;
+					let cp_options = ( is_dir ) ? { recursive: true, force: true } : {},
+						iscopied   = true;
 
 					await io.cp( path, `${local_path}${workflow_file.dest}`, cp_options ).catch( error => {
 						toolkit.log.error( 'Unable To Copy File.', '	' );
 						toolkit.log( error );
 						iscopied = false;
-					} );
+					} ).then( async() => {
+						await toolkit.git.add( local_path, `${workflow_file.dest}`, true );
 
-					if( iscopied ) {
-						let status = await toolkit.git.add( local_path, `${workflow_file.dest}`, true );
-
-						if( true === status ) {
+						if( COMMIT_EACH_FILE ) {
 							let haschange = await toolkit.git.hasChange( local_path, true );
-							if( false !== haschange ) {
-								toolkit.log.warn( haschange );
+							if( '' === haschange ) {
+								toolkit.log.success( 'No Changes Are Done :', '	' );
+							} else if( false !== haschange ) {
+								await helper.commitfile( local_path );
 							}
 						}
-					}
 
+					} );
 
+					toolkit.log( ' ' );
 				} );
+
+				if( DRY_RUN ) {
+					toolkit.log.warning( 'No Changes Are Pushed' );
+					toolkit.log( 'Git Status' );
+					toolkit.log( await toolkit.git.stats( local_path ) );
+					toolkit.log( ' ' );
+				} else {
+					let log_msg = ( false === COMMIT_EACH_FILE ) ? 'Git Commit & Push Log' : 'Git Push Log';
+					toolkit.log( log_msg );
+
+					if( !COMMIT_EACH_FILE ) {
+						let haschange = await toolkit.git.hasChange( local_path, true );
+						if( '' === haschange ) {
+							toolkit.log.success( 'No Changes Are Done :', '	' );
+						} else if( false !== haschange ) {
+							await helper.commitfile( local_path );
+						}
+					}
+					await toolkit.git.push( local_path, git_url );
+				}
+
 			}
 		}
 		core.endGroup();
