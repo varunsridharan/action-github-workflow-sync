@@ -3080,7 +3080,7 @@ const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSI
 				path: `${GITHUB_WORKSPACE}/${LOCATION}`,
 				relative_path: `${LOCATION}`,
 				dest_type: 'workflow',
-				is_dir: await fs.lstatSync( dirPath ).isDirectory(),
+				is_dir: await fs.lstatSync( `${GITHUB_WORKSPACE}/${LOCATION}` ).isDirectory(),
 			}
 		}
 	} );
@@ -3092,7 +3092,7 @@ const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSI
 					path: `${GITHUB_WORKSPACE}/${LOCATION}`,
 					relative_path: `${LOCATION}`,
 					dest_type: false,
-					is_dir: await fs.lstatSync( dirPath ).isDirectory(),
+					is_dir: await fs.lstatSync( `${GITHUB_WORKSPACE}/${LOCATION}` ).isDirectory(),
 				}
 			}
 		} );
