@@ -3476,7 +3476,9 @@ async function run() {
 					const { source_path, relative_path, dest_type, is_dir } = file_data;
 					workflow_file.dest                                      = ( 'workflow' === dest_type ) ? `.github/workflows/${workflow_file.dest}` : workflow_file.dest;
 
-					if( workflow_file.type === 'once' && await toolkit.path.exists( workflow_file.type ) ) {
+					let is_exists = await toolkit.path.exists( workflow_file.type );
+					toolkit.log( `File Exists? ${is_exists}` );
+					if( workflow_file.type === 'once' && is_exists ) {
 						toolkit.log.green( 'File Already Exists', '	' );
 						toolkit.log( '' );
 						return;
