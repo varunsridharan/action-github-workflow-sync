@@ -3339,7 +3339,9 @@ async function run() {
 					}
 
 					toolkit.log.success( `${relative_path} => ${workflow_file.dest}`, '	' );
+
 					let cp_options = {};
+
 					if( is_dir ) {
 						cp_options = { recursive: true, force: true };
 					}
@@ -3359,9 +3361,6 @@ async function run() {
 }
 
 run();
-
-
-
 
 /***/ }),
 
