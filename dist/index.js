@@ -3458,7 +3458,7 @@ async function run() {
 					toolkit.log.cyan( `${raw_workflow_file}` );
 
 					let workflow_file = helper.extract_workflow_file_info( raw_workflow_file );
-					toolkit.log( JSON.stringify( workflow_file ) );
+
 					if( false === workflow_file ) {
 						toolkit.log.error( `Unable To Parse ${raw_workflow_file}`, '	' );
 						toolkit.log( '' );
@@ -3474,12 +3474,11 @@ async function run() {
 					}
 
 					const { source_path, relative_path, dest_type, is_dir } = file_data;
-					workflow_file.dest                                      = ( 'workflow' === dest_type ) ? `.github/workflows/${workflow_file.dest}` : workflow_file.dest;
 
-					let is_exists = await toolkit.path.exists( `${local_path}${workflow_file.dest}` );
-					toolkit.log( `File Exists? ${is_exists}` );
-					if( workflow_file.type === 'once' && is_exists ) {
-						toolkit.log.green( 'File Already Exists', '	' );
+					workflow_file.dest = ( 'workflow' === dest_type ) ? `.github/workflows/${workflow_file.dest}` : workflow_file.dest;
+
+					if( workflow_file.type === 'once' && await toolkit.path.exists( `${local_path}${workflow_file.dest}` ) ) {
+						toolkit.log.green( '	File Already Exists' );
 						toolkit.log( '' );
 						return;
 					}
