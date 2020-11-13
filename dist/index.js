@@ -3461,27 +3461,27 @@ async function run() {
 
 					if( false === workflow_file ) {
 						toolkit.log.error( `Unable To Parse ${raw_workflow_file}`, '	' );
+						toolkit.log( '' );
 						return;
 					}
 
 					let file_data = await helper.source_file_location( WORKFLOW_FILES_DIR, owner, repository, workflow_file.src );
 
 					if( false === file_data ) {
-						toolkit.log.error( 'Unable To Find Source File !' );
+						toolkit.log.error( 'Unable To Find Source File !', '	' );
+						toolkit.log( '' );
 						return;
 					}
 
 					const { source_path, relative_path, dest_type, is_dir } = file_data;
+					workflow_file.dest                                      = ( 'workflow' === dest_type ) ? `.github/workflows/${workflow_file.dest}` : workflow_file.dest;
 
-					workflow_file.dest = ( 'workflow' === dest_type ) ? `.github/workflows/${workflow_file.dest}` : workflow_file.dest;
+					let cp_options    = ( is_dir ) ? { recursive: true, force: true } : {},
+						iscopied      = true,
+						dest_basepath = toolkit.path.dirname( `${local_path}${workflow_file.dest}` );
+
 
 					toolkit.log.success( `${relative_path} => ${workflow_file.dest}`, '	' );
-
-					let cp_options = ( is_dir ) ? { recursive: true, force: true } : {},
-						iscopied   = true;
-
-
-					let dest_basepath = toolkit.path.dirname( `${local_path}${workflow_file.dest}` );
 
 					if( !toolkit.path.exists( dest_basepath ) ) {
 						toolkit.log( `Creating ${dest_basepath}`, '	' );
@@ -3489,7 +3489,7 @@ async function run() {
 					}
 
 					let copy_source = ( await toolkit.path.isDir( source_path ) ) ? `${source_path}.` : source_path;
-					toolkit.log( source_path );
+
 					await io.cp( copy_source, `${local_path}${workflow_file.dest}`, cp_options ).catch( error => {
 						toolkit.log.error( 'Unable To Copy File.', '	' );
 						toolkit.log( error );
