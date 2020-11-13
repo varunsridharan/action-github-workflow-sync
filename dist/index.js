@@ -3487,21 +3487,18 @@ async function run() {
 					}
 
 					let iscopied = true;
-					toolkit.log.success( `${path} => ${local_path}/${workflow_file.dest}`, '	' );
 
-					await io.cp( path, `${local_path}/${workflow_file.dest}`, cp_options )
-							.then( () => toolkit.log( 'Copied' ) )
-							.catch( error => {
-								toolkit.log.error( 'Unable To Copy File.', '	' );
-								toolkit.log( error );
-								iscopied = false;
-							} );
+					await io.cp( path, `${local_path}${workflow_file.dest}`, cp_options ).catch( error => {
+						toolkit.log.error( 'Unable To Copy File.', '	' );
+						toolkit.log( error );
+						iscopied = false;
+					} );
 
 					if( iscopied ) {
-						let status = await toolkit.git.add( path, `${workflow_file.dest}`, true );
+						let status = await toolkit.git.add( local_path, `${workflow_file.dest}`, true );
 
 						if( true === status ) {
-							let haschange = await toolkit.git.hasChange( path, true );
+							let haschange = await toolkit.git.hasChange( local_path, true );
 							if( false !== haschange ) {
 								toolkit.log.warn( haschange );
 							}
