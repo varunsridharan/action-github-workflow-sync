@@ -2929,6 +2929,7 @@ const exec = __webpack_require__( 514 );
 const gh   = __webpack_require__( 809 );
 const core = __webpack_require__( 186 );
 const fs   = __webpack_require__( 747 );
+const path = __webpack_require__( 622 );
 
 const asyncForEach = async( array, callback ) => {
 	for( let index = 0; index < array.length; index++ ) {
@@ -3036,19 +3037,25 @@ const extract_workflow_file_info = ( file ) => {
 	 */
 	if( null !== m ) {
 		if( '' !== m[ 1 ] ) {
-			let src      = m[ 1 ],
-				operator = m[ 2 ],
-				dest     = m[ 3 ];
-			return {
-				src: src.trim(),
-				dest: ( '' !== dest ) ? dest.trim() : src.trim(),
-				type: ( '!=' === operator ) ? 'once' : 'copy',
-			}
+			let src               = m[ 1 ],
+				operator          = m[ 2 ],
+				dest              = m[ 3 ];
+			let $r                = { src: src.trim(), type: ( '!=' === operator ) ? 'once' : 'copy' }
+			$r[ 'dest' ]          = ( '' !== dest ) ? dest.trim() : $r[ 'src' ];
+			$r[ 'src_filename' ]  = path.basename( $r[ 'src' ] );
+			$r[ 'dest_filename' ] = path.basename( $r[ 'dest' ] );
+			return $r;
 		}
 		return false;
 	}
 
-	return { src: file, dest: file, type: 'copy' };
+	return {
+		src: file,
+		dest: file,
+		type: 'copy',
+		src_filename: path.basename( file ),
+		dest_filename: path.basename( file )
+	};
 };
 
 const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSITORY_NAME, SRC_FILE ) => {
@@ -3072,9 +3079,9 @@ const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSI
 				relative_path: `${LOCATION}`,
 				dest_type: 'workflow',
 			}
-			core.info( `	✅  ${GITHUB_WORKSPACE}/${LOCATION}` );
+			//core.info( `	✅  ${GITHUB_WORKSPACE}/${LOCATION}` );
 		} else {
-			core.info( `	🛑  ${GITHUB_WORKSPACE}/${LOCATION}` );
+			//core.info( `	🛑  ${GITHUB_WORKSPACE}/${LOCATION}` );
 		}
 	} );
 
@@ -3086,9 +3093,9 @@ const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSI
 					relative_path: `${LOCATION}`,
 					dest_type: false,
 				}
-				core.info( `	✅  ${GITHUB_WORKSPACE}/${LOCATION}` );
+				//core.info( `	✅  ${GITHUB_WORKSPACE}/${LOCATION}` );
 			} else {
-				core.info( `	🛑  ${GITHUB_WORKSPACE}/${LOCATION}` );
+				//core.info( `	🛑  ${GITHUB_WORKSPACE}/${LOCATION}` );
 			}
 		} );
 	}
@@ -3179,8 +3186,12 @@ async function run() {
 					}
 
 					const { path, relative_path, dest_type } = file_data;
-					core.info( relative_path );
-					core.info( dest_type )
+
+					if( 'workflow' === dest_type ) {
+						workflow_file.dest = `.github/workflows/${workflow_file.dest}`
+					}
+
+					gh.success( `	${relative_path} => ${workflow_file.dest}` )
 
 				} )
 			}
@@ -3231,13 +3242,13 @@ module.exports = {
 	env: gh_env,
 	validate_env: gh_validate_env,
 	success: function( message ) {
-		core.info( `✔️ ${message}` );
+		core.info( `✔️  ${message}` );
 	},
 	warn: function( message ) {
-		core.info( `⚠️ ${message}` );
+		core.info( `⚠️  ${message}` );
 	},
 	error: function( message ) {
-		core.error( `🛑  ${message}` );
+		core.error( `🛑     ${message}` );
 	}
 };
 
