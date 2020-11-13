@@ -3458,7 +3458,7 @@ async function run() {
 					toolkit.log.cyan( `${raw_workflow_file}` );
 
 					let workflow_file = helper.extract_workflow_file_info( raw_workflow_file );
-
+					toolkit.log( JSON.stringify( workflow_file ) );
 					if( false === workflow_file ) {
 						toolkit.log.error( `Unable To Parse ${raw_workflow_file}`, '	' );
 						toolkit.log( '' );
