@@ -3480,6 +3480,14 @@ async function run() {
 					let cp_options = ( is_dir ) ? { recursive: true, force: true } : {},
 						iscopied   = true;
 
+
+					let dest_basepath = toolkit.path.dirname( `${local_path}${workflow_file.dest}` );
+
+					if( !toolkit.path.exists( dest_basepath ) ) {
+						toolkit.log( `Creating ${dest_basepath}`, '	' );
+						await io.mkdirP( dest_basepath );
+					}
+
 					await io.cp( path, `${local_path}${workflow_file.dest}`, cp_options ).catch( error => {
 						toolkit.log.error( 'Unable To Copy File.', '	' );
 						toolkit.log( error );
