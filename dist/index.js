@@ -1599,6 +1599,58 @@ module.exports = async( work_dir, file, force_or_args = false, show_log = false 
 
 /***/ }),
 
+/***/ 352:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const nodeexec = __webpack_require__( 476 );
+const log      = __webpack_require__( 39 );
+
+module.exports = async( work_dir, message, force_or_args = false, show_log = true ) => {
+	let status = true;
+	let cmd    = 'git commit';
+	cmd += ` -m "${message}" `;
+
+	if( false !== force_or_args ) {
+		cmd += ` ${force_or_args} `;
+	}
+
+	await nodeexec( `${cmd}`, work_dir ).then( ( response ) => {
+		if( show_log ) {
+			log.success( `${response}` );
+		}
+	} ).catch( ( error ) => {
+		if( show_log ) {
+			log.error( `${error}` );
+		}
+		status = false;
+	} );
+	return status;
+};
+
+
+/***/ }),
+
+/***/ 417:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const nodeexec = __webpack_require__( 476 );
+const log      = __webpack_require__( 39 );
+
+module.exports = async( work_dir, show_log = false ) => {
+	let cmd    = 'git status --porcelain';
+	let status = false;
+	await nodeexec( `${cmd}`, work_dir ).then( ( response ) => status = response ).catch( ( error ) => {
+		if( show_log ) {
+			log.error( error );
+		}
+		status = false;
+	} );
+	return status;
+};
+
+
+/***/ }),
+
 /***/ 876:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -1631,11 +1683,66 @@ module.exports = async( GIT_PATH, GIT_USER, GIT_EMAIL, LOG = true ) => {
 /***/ 874:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const identity = __webpack_require__( 876 );
-const add      = __webpack_require__( 231 );
+const identity  = __webpack_require__( 876 );
+const add       = __webpack_require__( 231 );
+const hasChange = __webpack_require__( 417 );
+const stats     = __webpack_require__( 965 );
+const commit    = __webpack_require__( 352 );
+const push      = __webpack_require__( 23 );
 
-module.exports = { identity, add };
+module.exports = { identity, add, stats, hasChange, commit, push };
 
+
+
+/***/ }),
+
+/***/ 23:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const nodeexec = __webpack_require__( 476 );
+const log      = __webpack_require__( 39 );
+
+module.exports = async( work_dir, repository_url, args = false, show_log = true ) => {
+	let status = true;
+	let cmd    = `git push "${repository_url}" `;
+
+	if( false !== args ) {
+		cmd += ` ${args} `;
+	}
+
+	await nodeexec( `${cmd}`, work_dir ).then( ( response ) => {
+		if( show_log ) {
+			log.success( `${response}` );
+		}
+	} ).catch( ( error ) => {
+		if( show_log ) {
+			log.error( `${error}` );
+		}
+		status = false;
+	} );
+	return status;
+};
+
+
+/***/ }),
+
+/***/ 965:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const nodeexec = __webpack_require__( 476 );
+const log      = __webpack_require__( 39 );
+
+module.exports = async( work_dir, show_log = false ) => {
+	let cmd    = 'git status';
+	let status = false;
+	await nodeexec( `${cmd}`, work_dir ).then( ( response ) => status = response ).catch( ( error ) => {
+		if( show_log ) {
+			log.error( error );
+		}
+		status = false;
+	} );
+	return status;
+};
 
 
 /***/ }),
