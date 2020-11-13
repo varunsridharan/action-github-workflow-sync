@@ -3006,21 +3006,7 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 }
 
 const set_git_config = async( local_path ) => {
-	let GIT_EMAIL = __webpack_require__(424).GIT_EMAIL;
-	let GIT_USER  = __webpack_require__(424).GIT_USER;
-	let cmd       = `git config --local user.name "${GIT_USER}" && git config --local user.email "${GIT_EMAIL}"`;
-	let status    = true;
-	await gh.execCmd( cmd, local_path ).then( () => {
-		core.info( '' );
-		core.info( '🗃 Git Config' );
-		core.info( `	> Name  : ${GIT_USER}` );
-		core.info( `	> Email : ${GIT_EMAIL}` );
-		core.info( '' );
-	} ).catch( ( error ) => {
-		gh.error( 'Unable To Set GIT Identity' );
-		core.error( error );
-		status = false;
-	} );
+	let status = await gh.git_add( local_path, __webpack_require__(424).GIT_USER, __webpack_require__(424).GIT_EMAIL, true );
 	return status;
 }
 
@@ -3152,15 +3138,15 @@ async function run() {
 	/**
 	 * Loop Handler.
 	 */
-	await helper.asyncForEach( REPOSITORIES, async function( raw_repository, index ) {
+	await helper.asyncForEach( REPOSITORIES, async function( raw_repository ) {
 		core.startGroup( `📓 ${raw_repository}` );
 		core.info( `${style.magenta.open}⚙️ Repository Config${style.magenta.close}` );
 		let { repository, branch, owner, git_url, local_path } = helper.repositoryDetails( raw_repository );
-		core.info( `	Slug        : ${repository}` )
-		core.info( `	Owner       : ${owner}` )
-		core.info( `	Git URL     : ${git_url}` )
-		core.info( `	Branch      : ${branch}` )
-		core.info( `	Local Path  : ${local_path}` )
+		core.info( `	Slug        : ${repository}` );
+		core.info( `	Owner       : ${owner}` );
+		core.info( `	Git URL     : ${git_url}` );
+		core.info( `	Branch      : ${branch}` );
+		core.info( `	Local Path  : ${local_path}` );
 
 		let status = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
 
@@ -3168,7 +3154,7 @@ async function run() {
 			let identity_status = await helper.set_git_config( local_path );
 			if( identity_status ) {
 				await helper.asyncForEach( WORKFLOW_FILES, async function( raw_workflow_file ) {
-					core.info( `${style.cyan.open}${raw_workflow_file}${style.cyan.close}` )
+					core.info( `${style.cyan.open}${raw_workflow_file}${style.cyan.close}` );
 					let workflow_file = helper.extract_workflow_file_info( raw_workflow_file );
 
 					if( false === workflow_file ) {
@@ -3183,15 +3169,24 @@ async function run() {
 						return;
 					}
 
-					const { path, relative_path, dest_type } = file_data;
+					const { path, relative_path, dest_type, is_dir } = file_data;
 
 					if( 'workflow' === dest_type ) {
-						workflow_file.dest = `.github/workflows/${workflow_file.dest}`
+						workflow_file.dest = `.github/workflows/${workflow_file.dest}`;
 					}
-					core.info( JSON.stringify( file_data ) );
-					gh.success( `	${relative_path} => ${workflow_file.dest}` )
 
-				} )
+					gh.success( `${relative_path} => ${workflow_file.dest}`, '	' );
+					let cp_options = {};
+					if( is_dir ) {
+						cp_options = { recursive: true, force: true };
+					}
+
+					await io.cp( path, `${local_path}/${workflow_file.dest}`, cp_options ).catch( error => {
+						gh.error( 'Unable To Copy File.', '	' );
+						core.info( error );
+					} );
+
+				} );
 			}
 		}
 
@@ -3213,25 +3208,17 @@ run();
 const core     = __webpack_require__( 186 );
 const { exec } = __webpack_require__( 129 );
 
-function gh_env( key, _default ) {
-	let value = process.env[ key ];
-	return ( typeof value !== 'undefined' ) ? value : _default;
-}
-
-function gh_validate_env( key, message = false ) {
+const gh_env          = ( key, _default ) => ( typeof process.env[ key ] !== 'undefined' ) ? process.env[ key ] : _default;
+const gh_validate_env = ( key, message = false ) => {
 	if( undefined === gh_env( key ) ) {
 		message = ( '' === message || false === message ) ? `🚩  ${key} Not Found. Please Set It As ENV Variable` : message;
 		core.setFailed( message );
 	}
 }
-
-function execCmd( command, workingDir ) {
-	return new Promise( ( resolve, reject ) => {
-		exec( command, { cwd: workingDir, }, ( error, stdout ) => error ? reject( error ) : resolve( stdout.trim() ) );
-	} );
-}
-
-function fix_path( $path ) {
+const execCmd         = ( command, workingDir ) => new Promise( ( resolve, reject ) => {
+	exec( command, { cwd: workingDir, }, ( error, stdout ) => error ? reject( error ) : resolve( stdout.trim() ) );
+} );
+const fix_path        = ( $path ) => {
 	$path       = $path.trim();
 	const regex = /^(\s|\/..\/|(?:\/|).\/|\/)(.+)/;
 	let m       = regex.exec( $path );
@@ -3245,24 +3232,35 @@ function fix_path( $path ) {
 	}
 	return $path;
 }
+const git_add         = async( GIT_PATH, GIT_USER, GIT_EMAIL, LOG = true ) => {
+	let status = true;
+	let cmd    = `git config --local user.name "${GIT_USER}" && git config --local user.email "${GIT_EMAIL}"`;
+	await execCmd( cmd, GIT_PATH ).then( () => {
+		if( LOG ) {
+			core.info( '' );
+			core.info( '🗃 Git Config' );
+			core.info( `	> Name  : ${GIT_USER}` );
+			core.info( `	> Email : ${GIT_EMAIL}` );
+			core.info( '' );
+		}
+	} ).catch( ( error ) => {
+		gh.error( 'Unable To Set GIT Identity' );
+		core.error( error );
+		status = false;
+	} );
+	return status;
+}
 
 module.exports = {
+	git_add: git_add,
 	fix_path: fix_path,
 	execCmd: execCmd,
-	input_bool: function( value ) {
-		return ( value === 'true' );
-	},
+	input_bool: ( value ) => ( value === 'true' ),
 	env: gh_env,
 	validate_env: gh_validate_env,
-	success: function( message ) {
-		core.info( `✔️  ${message}` );
-	},
-	warn: function( message ) {
-		core.info( `⚠️  ${message}` );
-	},
-	error: function( message ) {
-		core.error( `🛑     ${message}` );
-	}
+	success: ( message, before = '' ) => core.info( `${before}✔️  ${message}` ),
+	warn: ( message, before = '' ) => core.info( `${before}⚠️  ${message}` ),
+	error: ( message, before = '' ) => core.error( `${before}🛑️  ${message}` ),
 };
 
 /***/ }),
