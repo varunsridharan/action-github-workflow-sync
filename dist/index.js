@@ -3252,9 +3252,9 @@ const repositoryDetails = ( input_repo ) => {
 	input_repo    = input_repo.split( '@' );
 
 	// Extract Branch Info varunsridharan/demo@master
-	let branch    = ( typeof input_repo[ 1 ] !== 'undefined' ) ? input_repo[ 1 ] : false;
-	branch        = ( false === branch || '' === branch ) ? 'default' : branch;
-	input_repo    = input_repo[ 0 ].split( '/' );
+	let branch = ( typeof input_repo[ 1 ] !== 'undefined' ) ? input_repo[ 1 ] : false;
+	branch     = ( false === branch || '' === branch ) ? 'default' : branch;
+	input_repo = input_repo[ 0 ].split( '/' );
 
 	return {
 		owner: input_repo[ 0 ],
@@ -3361,7 +3361,7 @@ const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSI
 	await toolkit.asyncForEach( workflows_files, async( LOCATION ) => {
 		if( toolkit.path.exists( `${GITHUB_WORKSPACE}/${LOCATION}` ) && false === _return ) {
 			_return = {
-				path: `${GITHUB_WORKSPACE}/${LOCATION}`,
+				source_path: `${GITHUB_WORKSPACE}/${LOCATION}`,
 				relative_path: `${LOCATION}`,
 				dest_type: 'workflow',
 				is_dir: await toolkit.path.isDir( `${GITHUB_WORKSPACE}/${LOCATION}` ),
@@ -3373,7 +3373,7 @@ const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSI
 		await toolkit.asyncForEach( general_files, async( LOCATION ) => {
 			if( toolkit.path.exists( `${GITHUB_WORKSPACE}/${LOCATION}` ) && false === _return ) {
 				_return = {
-					path: `${GITHUB_WORKSPACE}/${LOCATION}`,
+					source_path: `${GITHUB_WORKSPACE}/${LOCATION}`,
 					relative_path: `${LOCATION}`,
 					dest_type: false,
 					is_dir: await toolkit.path.isDir( `${GITHUB_WORKSPACE}/${LOCATION}` ),
@@ -3471,7 +3471,7 @@ async function run() {
 						return;
 					}
 
-					const { path, relative_path, dest_type, is_dir } = file_data;
+					const { source_path, relative_path, dest_type, is_dir } = file_data;
 
 					workflow_file.dest = ( 'workflow' === dest_type ) ? `.github/workflows/${workflow_file.dest}` : workflow_file.dest;
 
@@ -3488,7 +3488,9 @@ async function run() {
 						await io.mkdirP( dest_basepath );
 					}
 
-					await io.cp( path, `${local_path}${workflow_file.dest}`, cp_options ).catch( error => {
+					let copy_source = ( await toolkit.path.isDir( source_path ) ) ? `${source_path}.` : source_path;
+					toolkit.log( source_path );
+					await io.cp( copy_source, `${local_path}${workflow_file.dest}`, cp_options ).catch( error => {
 						toolkit.log.error( 'Unable To Copy File.', '	' );
 						toolkit.log( error );
 						iscopied = false;
