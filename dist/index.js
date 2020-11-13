@@ -3178,8 +3178,6 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 				  .then( () => toolkit.log.success( `Repository Branch ${branch} Cloned` ) )
 				  .catch( async() => {
 					  if( false !== auto_create_branch ) {
-						  core.warning( `auto_create_branch : ${auto_create_branch}` );
-
 						  toolkit.log.warn( 'Branch Not found' );
 						  await exec.exec( `git clone ${common_arg} ${git_url} "${local_path}"`, [], options )
 									.then( async() => {
@@ -3384,9 +3382,16 @@ async function run() {
 					await io.cp( path, `${local_path}/${workflow_file.dest}`, cp_options ).catch( error => {
 						toolkit.log.error( 'Unable To Copy File.', '	' );
 						toolkit.log( error );
-					} );
+					} ).then( async() => {
+						let status = await toolkit.git.add( path, `${workflow_file.dest}`, true );
 
-					await toolkit.git.add( path, `${workflow_file.dest}`, true );
+						if( true === status ) {
+							let haschange = await toolkit.git.hasChange( path, true );
+							if( false !== haschange ) {
+								toolkit.log.warn( haschange );
+							}
+						}
+					} );
 				} );
 			}
 		}
