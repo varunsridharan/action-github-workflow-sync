@@ -3300,7 +3300,7 @@ run();
 
 const core    = __webpack_require__( 186 );
 const toolkit = __webpack_require__( 338 );
-core.info( toolkit );
+core.info( toolkit.input );
 const AUTO_CREATE_NEW_BRANCH = toolkit.input.tobool( core.getInput( 'AUTO_CREATE_NEW_BRANCH' ) );
 const COMMIT_EACH_FILE       = toolkit.input.tobool( core.getInput( 'COMMIT_EACH_FILE' ) );
 const DRY_RUN                = toolkit.input.tobool( core.getInput( 'DRY_RUN' ) );
