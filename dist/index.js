@@ -3042,13 +3042,15 @@ const extract_workflow_file_info = ( file ) => {
 				dest              = m[ 3 ];
 			let $r                = { src: src.trim(), type: ( '!=' === operator ) ? 'once' : 'copy' }
 			$r[ 'dest' ]          = ( '' !== dest ) ? dest.trim() : $r[ 'src' ];
+			$r[ 'src' ]           = gh.fix_path( $r[ 'src' ] );
+			$r[ 'dest' ]          = gh.fix_path( $r[ 'dest' ] );
 			$r[ 'src_filename' ]  = path.basename( $r[ 'src' ] );
 			$r[ 'dest_filename' ] = path.basename( $r[ 'dest' ] );
 			return $r;
 		}
 		return false;
 	}
-
+	file = gh.fix_path( file );
 	return {
 		src: file,
 		dest: file,
@@ -3233,8 +3235,23 @@ function execCmd( command, workingDir ) {
 	} );
 }
 
+function fix_path( $path ) {
+	$path       = $path.trim();
+	const regex = /^(\s|\/..\/|(?:\/|).\/|\/)(.+)/;
+	let m       = regex.exec( $path );
+
+	if( null !== m && typeof m[ 2 ] !== 'undefined' ) {
+		$path = m[ 2 ];
+		if( typeof m[ 1 ] !== 'undefined' && m[ 1 ] === '/../' ) {
+			$path = `../${$path}`;
+		}
+
+	}
+	return $path;
+}
 
 module.exports = {
+	fix_path: fix_path,
 	execCmd: execCmd,
 	input_bool: function( value ) {
 		return ( value === 'true' );
