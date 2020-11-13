@@ -3063,44 +3063,44 @@ const repositoryDetails = ( input_repo ) => {
 		git_url,
 		branch,
 		local_path
-	}
+	};
 
 };
 
 const repositoryClone = async( git_url, local_path, branch, auto_create_branch ) => {
-	const common_arg = '--quiet --no-hardlinks --no-tags'
+	const common_arg = '--quiet --no-hardlinks --no-tags';
 	const options    = { silent: true };
 	let stauts       = true;
 	if( 'default' === branch ) {
 		await exec.exec( `git clone ${common_arg} --depth 1 ${git_url} "${local_path}"`, [], options )
 				  .then( () => toolkit.log.success( 'Repository Cloned' ) )
-				  .catch( ( error ) => {
-					  toolkit.log.error( 'Repository Dose Not Exists !' )
+				  .catch( () => {
+					  toolkit.log.error( 'Repository Dose Not Exists !' );
 					  stauts = false;
 				  } );
 	} else {
 		await exec.exec( `git clone ${common_arg} --depth 1 --branch "${branch}" ${git_url} "${local_path}"`, [], options )
 				  .then( () => toolkit.log.success( `Repository Branch ${branch} Cloned` ) )
-				  .catch( async( error ) => {
+				  .catch( async() => {
 					  if( false !== auto_create_branch ) {
-						  core.warning( `auto_create_branch : ${auto_create_branch}` )
+						  core.warning( `auto_create_branch : ${auto_create_branch}` );
 
 						  gh.warn( 'Branch Not found' );
 						  await exec.exec( `git clone ${common_arg} ${git_url} "${local_path}"`, [], options )
 									.then( async() => {
 										await exec.exec( `cd ${local_path} && git checkout -b ${branch}`, [], options )
 												  .then( () => {
-													  toolkit.log.success( 'Repository Cloned' )
-													  toolkit.log.success( 'Branch Created' )
+													  toolkit.log.success( 'Repository Cloned' );
+													  toolkit.log.success( 'Branch Created' );
 													  stauts = 'created';
 												  } )
 												  .catch( () => {
-													  toolkit.log.error( 'Unable To Create Branch.' )
+													  toolkit.log.error( 'Unable To Create Branch.' );
 													  stauts = false;
 												  } );
 									} )
-									.catch( ( error ) => {
-										toolkit.log.error( 'Repository Dose Not Exists !' )
+									.catch( () => {
+										toolkit.log.error( 'Repository Dose Not Exists !' );
 										stauts = false;
 									} );
 					  } else {
@@ -3112,10 +3112,7 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 	return stauts;
 };
 
-const set_git_config = async( local_path ) => {
-	let status = await toolkit.log( local_path, __webpack_require__(424).GIT_USER, __webpack_require__(424).GIT_EMAIL, true );
-	return status;
-};
+const set_git_config = async( local_path ) => await toolkit.git.identity( local_path, __webpack_require__(424).GIT_USER, __webpack_require__(424).GIT_EMAIL, true );
 
 const extract_workflow_file_info = ( file ) => {
 	const regex = /([\s\S]*?)(\!=|=)([\s\S].+|)/;
@@ -3130,15 +3127,15 @@ const extract_workflow_file_info = ( file ) => {
 	 */
 	if( null !== m ) {
 		if( '' !== m[ 1 ] ) {
-			let src               = m[ 1 ],
-				operator          = m[ 2 ],
-				dest              = m[ 3 ];
-			let $r                = { src: src.trim(), type: ( '!=' === operator ) ? 'once' : 'copy' }
-			$r[ 'dest' ]          = ( '' !== dest ) ? dest.trim() : $r[ 'src' ];
-			$r[ 'src' ]           = gh.fix_path( $r[ 'src' ] );
-			$r[ 'dest' ]          = gh.fix_path( $r[ 'dest' ] );
-			$r[ 'src_filename' ]  = path.basename( $r[ 'src' ] );
-			$r[ 'dest_filename' ] = path.basename( $r[ 'dest' ] );
+			let src          = m[ 1 ],
+				operator     = m[ 2 ],
+				dest         = m[ 3 ];
+			let $r           = { src: src.trim(), type: ( '!=' === operator ) ? 'once' : 'copy' };
+			$r.dest          = ( '' !== dest ) ? dest.trim() : $r.src;
+			$r.src           = gh.fix_path( $r.src );
+			$r.dest          = gh.fix_path( $r.dest );
+			$r.src_filename  = path.basename( $r.src );
+			$r.dest_filename = path.basename( $r.dest );
 			return $r;
 		}
 		return false;
@@ -3174,7 +3171,7 @@ const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSI
 				relative_path: `${LOCATION}`,
 				dest_type: 'workflow',
 				is_dir: await fs.lstatSync( `${GITHUB_WORKSPACE}/${LOCATION}` ).isDirectory(),
-			}
+			};
 		}
 	} );
 
@@ -3186,13 +3183,13 @@ const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSI
 					relative_path: `${LOCATION}`,
 					dest_type: false,
 					is_dir: await fs.lstatSync( `${GITHUB_WORKSPACE}/${LOCATION}` ).isDirectory(),
-				}
+				};
 			}
 		} );
 	}
 
 	return _return;
-}
+};
 
 module.exports = {
 	asyncForEach: asyncForEach,
