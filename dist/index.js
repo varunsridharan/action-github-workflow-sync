@@ -1566,6 +1566,39 @@ module.exports = asyncForEach;
 
 /***/ }),
 
+/***/ 231:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const nodeexec = __webpack_require__( 476 );
+const gh_core  = __webpack_require__( 186 );
+const log      = __webpack_require__( 39 );
+
+module.exports = async( work_dir, file, force_or_args = false, show_log = false ) => {
+	let status = true;
+	let cmd    = 'git add';
+	if( true === force_or_args ) {
+		cmd += ' -f';
+	} else if( false !== force_or_args ) {
+		cmd += ` ${force_or_args} `;
+	}
+
+	await nodeexec( `${cmd} ${file}`, work_dir ).then( () => {
+		if( show_log ) {
+			log.success( 'File Added' );
+		}
+	} ).catch( ( error ) => {
+		if( show_log ) {
+			log.error( 'Unable To File' );
+			gh_core.error( error );
+		}
+		status = false;
+	} );
+	return status;
+};
+
+
+/***/ }),
+
 /***/ 876:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -1598,9 +1631,11 @@ module.exports = async( GIT_PATH, GIT_USER, GIT_EMAIL, LOG = true ) => {
 /***/ 874:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-module.exports = {
-	identity: __webpack_require__( 876 ),
-};
+const identity = __webpack_require__( 876 );
+const add      = __webpack_require__( 231 );
+
+module.exports = { identity, add };
+
 
 
 /***/ }),
