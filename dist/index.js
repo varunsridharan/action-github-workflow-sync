@@ -1652,6 +1652,7 @@ log.warning = ( log, before = '' ) => gh_core.warning( `${before}⚠️ ${log}` 
 log.error   = ( log, before = '' ) => gh_core.error( `${before}🛑️  ${log}` );
 log.warn    = ( log, before = '' ) => gh_core.info( `${before}⚠️ ${log}` );
 log.err     = ( log, before = '' ) => gh_core.info( `${before}🛑️  ${log}` );
+
 /**
  * Colored Logs
  */
