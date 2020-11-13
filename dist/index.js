@@ -3271,14 +3271,14 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 	let stauts       = true;
 	if( 'default' === branch ) {
 		await exec.exec( `git clone ${common_arg} --depth 1 ${git_url} "${local_path}"`, [], options )
-				  .then( () => toolkit.log.success( 'Repository Cloned' ) )
+				  .then( () => toolkit.log.success( 'Repository Cloned', '	' ) )
 				  .catch( () => {
-					  toolkit.log.error( 'Repository Dose Not Exists !' );
+					  toolkit.log.error( 'Repository Dose Not Exists !', '	' );
 					  stauts = false;
 				  } );
 	} else {
 		await exec.exec( `git clone ${common_arg} --depth 1 --branch "${branch}" ${git_url} "${local_path}"`, [], options )
-				  .then( () => toolkit.log.success( `Repository Branch ${branch} Cloned` ) )
+				  .then( () => toolkit.log.success( `Repository Branch ${branch} Cloned`, '	' ) )
 				  .catch( async() => {
 					  if( false !== auto_create_branch ) {
 						  toolkit.log.warn( 'Branch Not found' );
@@ -3286,21 +3286,21 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 									.then( async() => {
 										await toolkit.exec( `git checkout -b ${branch}`, local_path )
 													 .then( () => {
-														 toolkit.log.success( 'Repository Cloned' );
-														 toolkit.log.success( 'Branch Created' );
+														 toolkit.log.success( 'Repository Cloned', '	' );
+														 toolkit.log.success( 'Branch Created', '	' );
 														 stauts = 'created';
 													 } )
 													 .catch( () => {
-														 toolkit.log.error( 'Unable To Create Branch.' );
+														 toolkit.log.error( 'Unable To Create Branch.', '	' );
 														 stauts = false;
 													 } );
 									} )
 									.catch( () => {
-										toolkit.log.error( 'Repository Dose Not Exists !' );
+										toolkit.log.error( 'Repository Dose Not Exists !', '	' );
 										stauts = false;
 									} );
 					  } else {
-						  toolkit.log.error( `Repository Branch ${branch} Not Found!` );
+						  toolkit.log.error( `Repository Branch ${branch} Not Found!`, '	' );
 						  stauts = false;
 					  }
 				  } );
@@ -3475,6 +3475,12 @@ async function run() {
 
 					const { source_path, relative_path, dest_type, is_dir } = file_data;
 					workflow_file.dest                                      = ( 'workflow' === dest_type ) ? `.github/workflows/${workflow_file.dest}` : workflow_file.dest;
+
+					if( workflow_file.type === 'once' && await toolkit.path.exists( workflow_file.type ) ) {
+						toolkit.log.green( 'File Already Exists', '	' );
+						toolkit.log( '' );
+						return;
+					}
 
 					let cp_options    = ( is_dir ) ? { recursive: true, force: true } : {},
 						iscopied      = true,
