@@ -3284,16 +3284,16 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 						  toolkit.log.warn( 'Branch Not found' );
 						  await exec.exec( `git clone ${common_arg} ${git_url} "${local_path}"`, [], options )
 									.then( async() => {
-										await exec.exec( `cd ${local_path} && git checkout -b ${branch}`, [], options )
-												  .then( () => {
-													  toolkit.log.success( 'Repository Cloned' );
-													  toolkit.log.success( 'Branch Created' );
-													  stauts = 'created';
-												  } )
-												  .catch( () => {
-													  toolkit.log.error( 'Unable To Create Branch.' );
-													  stauts = false;
-												  } );
+										await toolkit.exec( `git checkout -b ${branch}`, local_path )
+													 .then( () => {
+														 toolkit.log.success( 'Repository Cloned' );
+														 toolkit.log.success( 'Branch Created' );
+														 stauts = 'created';
+													 } )
+													 .catch( () => {
+														 toolkit.log.error( 'Unable To Create Branch.' );
+														 stauts = false;
+													 } );
 									} )
 									.catch( () => {
 										toolkit.log.error( 'Repository Dose Not Exists !' );
