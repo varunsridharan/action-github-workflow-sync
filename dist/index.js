@@ -1552,6 +1552,112 @@ function copyFile(srcFile, destFile, force) {
 
 /***/ }),
 
+/***/ 876:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const nodeexec = __webpack_require__( 476 );
+const gh_core  = __webpack_require__( 186 );
+const log      = __webpack_require__( 39 );
+
+module.exports = async( GIT_PATH, GIT_USER, GIT_EMAIL, LOG = true ) => {
+	let status = true;
+	let cmd    = `git config --local user.name "${GIT_USER}" && git config --local user.email "${GIT_EMAIL}"`;
+	await nodeexec( cmd, GIT_PATH ).then( () => {
+		if( LOG ) {
+			log( '' );
+			log( '🗃 Git Config' );
+			log( `	> Name  : ${GIT_USER}` );
+			log( `	> Email : ${GIT_EMAIL}` );
+			log( '' );
+		}
+	} ).catch( ( error ) => {
+		log.error( 'Unable To Set GIT Identity' );
+		gh_core.error( error );
+		status = false;
+	} );
+	return status;
+};
+
+
+/***/ }),
+
+/***/ 874:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+module.exports = {
+	identity: __webpack_require__( 876 ),
+};
+
+
+/***/ }),
+
+/***/ 338:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+module.exports = {
+	log: __webpack_require__( 39 ),
+	exec: __webpack_require__( 476 ),
+	git: __webpack_require__( 874 )
+};
+
+
+/***/ }),
+
+/***/ 904:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const gh_core = __webpack_require__( 186 );
+
+module.exports = ( log, before = '' ) => gh_core.error( `${before}🛑️  ${log}` );
+
+
+/***/ }),
+
+/***/ 39:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const gh_core = __webpack_require__( 186 );
+const log     = ( log ) => gh_core.info( `${log}` );
+
+log.error   = __webpack_require__( 904 );
+log.success = __webpack_require__( 277 );
+log.warning = __webpack_require__( 37 );
+
+module.exports = log;
+
+
+/***/ }),
+
+/***/ 277:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const gh_core = __webpack_require__( 186 );
+
+module.exports = ( log, before = '' ) => gh_core.error( `${before}✔  ${log}` );
+
+
+/***/ }),
+
+/***/ 37:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const gh_core = __webpack_require__( 186 );
+
+module.exports = ( log, before = '' ) => gh_core.warning( `${before}⚠️ ${log}` );
+
+
+/***/ }),
+
+/***/ 476:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { exec } = __webpack_require__( 129 );
+
+module.exports = ( command, workingDir ) => new Promise( ( resolve, reject ) => exec( command, { cwd: workingDir, }, ( error, stdout ) => error ? reject( error ) : resolve( stdout.trim() ) ));
+
+
+/***/ }),
+
 /***/ 68:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -2925,11 +3031,12 @@ module.exports = {
 /***/ 989:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const exec = __webpack_require__( 514 );
-const gh   = __webpack_require__( 809 );
-const core = __webpack_require__( 186 );
-const fs   = __webpack_require__( 747 );
-const path = __webpack_require__( 622 );
+const exec    = __webpack_require__( 514 );
+const gh      = __webpack_require__( 809 );
+const core    = __webpack_require__( 186 );
+const fs      = __webpack_require__( 747 );
+const path    = __webpack_require__( 622 );
+const toolkit = __webpack_require__( 338 );
 
 const asyncForEach = async( array, callback ) => {
 	for( let index = 0; index < array.length; index++ ) {
@@ -2966,14 +3073,14 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 	let stauts       = true;
 	if( 'default' === branch ) {
 		await exec.exec( `git clone ${common_arg} --depth 1 ${git_url} "${local_path}"`, [], options )
-				  .then( () => gh.success( 'Repository Cloned' ) )
-				  .catch( error => {
-					  gh.error( 'Repository Dose Not Exists !' )
+				  .then( () => toolkit.log.success( 'Repository Cloned' ) )
+				  .catch( ( error ) => {
+					  toolkit.log.error( 'Repository Dose Not Exists !' )
 					  stauts = false;
 				  } );
 	} else {
 		await exec.exec( `git clone ${common_arg} --depth 1 --branch "${branch}" ${git_url} "${local_path}"`, [], options )
-				  .then( () => gh.success( `Repository Branch ${branch} Cloned` ) )
+				  .then( () => toolkit.log.success( `Repository Branch ${branch} Cloned` ) )
 				  .catch( async( error ) => {
 					  if( false !== auto_create_branch ) {
 						  core.warning( `auto_create_branch : ${auto_create_branch}` )
@@ -2983,32 +3090,32 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 									.then( async() => {
 										await exec.exec( `cd ${local_path} && git checkout -b ${branch}`, [], options )
 												  .then( () => {
-													  gh.success( 'Repository Cloned' )
-													  gh.success( 'Branch Created' )
+													  toolkit.log.success( 'Repository Cloned' )
+													  toolkit.log.success( 'Branch Created' )
 													  stauts = 'created';
 												  } )
 												  .catch( () => {
-													  gh.error( 'Unable To Create Branch.' )
+													  toolkit.log.error( 'Unable To Create Branch.' )
 													  stauts = false;
 												  } );
 									} )
-									.catch( error => {
-										gh.error( 'Repository Dose Not Exists !' )
+									.catch( ( error ) => {
+										toolkit.log.error( 'Repository Dose Not Exists !' )
 										stauts = false;
 									} );
 					  } else {
-						  gh.error( `Repository Branch ${branch} Not Found!` );
+						  toolkit.log.error( `Repository Branch ${branch} Not Found!` );
 						  stauts = false;
 					  }
 				  } );
 	}
 	return stauts;
-}
+};
 
 const set_git_config = async( local_path ) => {
-	let status = await gh.git_add( local_path, __webpack_require__(424).GIT_USER, __webpack_require__(424).GIT_EMAIL, true );
+	let status = await toolkit.log( local_path, __webpack_require__(424).GIT_USER, __webpack_require__(424).GIT_EMAIL, true );
 	return status;
-}
+};
 
 const extract_workflow_file_info = ( file ) => {
 	const regex = /([\s\S]*?)(\!=|=)([\s\S].+|)/;
@@ -3101,12 +3208,12 @@ module.exports = {
 /***/ 351:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-const core   = __webpack_require__( 186 );
-const exec   = __webpack_require__( 514 );
-const io     = __webpack_require__( 436 );
-const helper = __webpack_require__( 989 );
-const style  = __webpack_require__( 68 );
-const gh     = __webpack_require__( 809 );
+const core    = __webpack_require__( 186 );
+const exec    = __webpack_require__( 514 );
+const io      = __webpack_require__( 436 );
+const helper  = __webpack_require__( 989 );
+const style   = __webpack_require__( 68 );
+const toolkit = __webpack_require__( 338 );
 
 async function run() {
 	let AUTO_CREATE_NEW_BRANCH = __webpack_require__(424).AUTO_CREATE_NEW_BRANCH;
@@ -3118,16 +3225,16 @@ async function run() {
 	let REPOSITORIES           = __webpack_require__(424).REPOSITORIES;
 	let WORKFLOW_FILES         = __webpack_require__(424).WORKFLOW_FILES;
 
-	core.info( '-------------------------------------------------------' );
-	core.info( '⚙️ Basic Config' );
-	core.info( `  * AUTO_CREATE_NEW_BRANCH     : ${AUTO_CREATE_NEW_BRANCH}` );
-	core.info( `  * COMMIT_EACH_FILE           : ${COMMIT_EACH_FILE}` );
-	core.info( `  * DRY_RUN                    : ${DRY_RUN}` );
-	core.info( `  * WORKFLOW_FILES_DIR         : ${WORKFLOW_FILES_DIR}` );
-	core.info( `  * WORKSPACE                  : ${WORKSPACE}` );
-	core.info( `  * GITHUB_TOKEN               : ${GITHUB_TOKEN}` );
-	core.info( '-------------------------------------------------------' );
-	core.info( '' );
+	toolkit.log( '-------------------------------------------------------' );
+	toolkit.log( '⚙️ Basic Config' );
+	toolkit.log( `  * AUTO_CREATE_NEW_BRANCH     : ${AUTO_CREATE_NEW_BRANCH}` );
+	toolkit.log( `  * COMMIT_EACH_FILE           : ${COMMIT_EACH_FILE}` );
+	toolkit.log( `  * DRY_RUN                    : ${DRY_RUN}` );
+	toolkit.log( `  * WORKFLOW_FILES_DIR         : ${WORKFLOW_FILES_DIR}` );
+	toolkit.log( `  * WORKSPACE                  : ${WORKSPACE}` );
+	toolkit.log( `  * GITHUB_TOKEN               : ${GITHUB_TOKEN}` );
+	toolkit.log( '-------------------------------------------------------' );
+	toolkit.log( '' );
 
 	/**
 	 * General Config
@@ -3140,13 +3247,13 @@ async function run() {
 	 */
 	await helper.asyncForEach( REPOSITORIES, async function( raw_repository ) {
 		core.startGroup( `📓 ${raw_repository}` );
-		core.info( `${style.magenta.open}⚙️ Repository Config${style.magenta.close}` );
+		toolkit.log( `${style.magenta.open}⚙️ Repository Config${style.magenta.close}` );
 		let { repository, branch, owner, git_url, local_path } = helper.repositoryDetails( raw_repository );
-		core.info( `	Slug        : ${repository}` );
-		core.info( `	Owner       : ${owner}` );
-		core.info( `	Git URL     : ${git_url}` );
-		core.info( `	Branch      : ${branch}` );
-		core.info( `	Local Path  : ${local_path}` );
+		toolkit.log( `	Slug        : ${repository}` );
+		toolkit.log( `	Owner       : ${owner}` );
+		toolkit.log( `	Git URL     : ${git_url}` );
+		toolkit.log( `	Branch      : ${branch}` );
+		toolkit.log( `	Local Path  : ${local_path}` );
 
 		let status = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
 
@@ -3154,18 +3261,18 @@ async function run() {
 			let identity_status = await helper.set_git_config( local_path );
 			if( identity_status ) {
 				await helper.asyncForEach( WORKFLOW_FILES, async function( raw_workflow_file ) {
-					core.info( `${style.cyan.open}${raw_workflow_file}${style.cyan.close}` );
+					toolkit.log( `${style.cyan.open}${raw_workflow_file}${style.cyan.close}` );
 					let workflow_file = helper.extract_workflow_file_info( raw_workflow_file );
 
 					if( false === workflow_file ) {
-						gh.error( `	Unable To Parse ${raw_workflow_file}` );
+						toolkit.log.error( `	Unable To Parse ${raw_workflow_file}` );
 						return;
 					}
 
 					let file_data = await helper.source_file_location( WORKFLOW_FILES_DIR, owner, repository, workflow_file.src );
 
 					if( false === file_data ) {
-						gh.error( 'Unable To Find Source File !' );
+						toolkit.log.error( 'Unable To Find Source File !' );
 						return;
 					}
 
@@ -3175,15 +3282,15 @@ async function run() {
 						workflow_file.dest = `.github/workflows/${workflow_file.dest}`;
 					}
 
-					gh.success( `${relative_path} => ${workflow_file.dest}`, '	' );
+					toolkit.log.success( `${relative_path} => ${workflow_file.dest}`, '	' );
 					let cp_options = {};
 					if( is_dir ) {
 						cp_options = { recursive: true, force: true };
 					}
 
 					await io.cp( path, `${local_path}/${workflow_file.dest}`, cp_options ).catch( error => {
-						gh.error( 'Unable To Copy File.', '	' );
-						core.info( error );
+						toolkit.log.error( 'Unable To Copy File.', '	' );
+						toolkit.log( error );
 					} );
 
 				} );
@@ -3191,7 +3298,7 @@ async function run() {
 		}
 
 		core.endGroup();
-		core.info( '' );
+		toolkit.log( '' );
 	} );
 }
 
@@ -3268,10 +3375,9 @@ module.exports = {
 /***/ 424:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const core = __webpack_require__( 186 );
-const path = __webpack_require__( 622 );
-const gh   = __webpack_require__( 809 );
-
+const core    = __webpack_require__( 186 );
+const path    = __webpack_require__( 622 );
+const gh      = __webpack_require__( 809 );
 
 const AUTO_CREATE_NEW_BRANCH = gh.input_bool( core.getInput( 'AUTO_CREATE_NEW_BRANCH' ) );
 const COMMIT_EACH_FILE       = gh.input_bool( core.getInput( 'COMMIT_EACH_FILE' ) );
