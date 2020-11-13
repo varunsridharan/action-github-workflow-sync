@@ -3178,7 +3178,9 @@ async function run() {
 						return;
 					}
 
-					core.info( JSON.stringify( file_data ) );
+					const { path, relative_path, dest_type } = file_data;
+					core.info( relative_path );
+					core.info( dest_type )
 
 				} )
 			}
