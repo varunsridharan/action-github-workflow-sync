@@ -3486,10 +3486,14 @@ async function run() {
 						cp_options = { recursive: true, force: true };
 					}
 
+					let iscopied = true;
 					await io.cp( path, `${local_path}/${workflow_file.dest}`, cp_options ).catch( error => {
 						toolkit.log.error( 'Unable To Copy File.', '	' );
 						toolkit.log( error );
-					} ).then( async() => {
+						iscopied = false;
+					} );
+
+					if( iscopied ) {
 						let status = await toolkit.git.add( path, `${workflow_file.dest}`, true );
 
 						if( true === status ) {
@@ -3498,7 +3502,9 @@ async function run() {
 								toolkit.log.warn( haschange );
 							}
 						}
-					} );
+					}
+
+
 				} );
 			}
 		}
@@ -3516,9 +3522,7 @@ run();
 
 const core    = __webpack_require__( 186 );
 const toolkit = __webpack_require__( 338 );
-core.info( Object.keys( toolkit ) );
-core.info( Object.keys( toolkit.input ) );
-core.info( toolkit.input );
+
 const AUTO_CREATE_NEW_BRANCH = toolkit.input.tobool( core.getInput( 'AUTO_CREATE_NEW_BRANCH' ) );
 const COMMIT_EACH_FILE       = toolkit.input.tobool( core.getInput( 'COMMIT_EACH_FILE' ) );
 const DRY_RUN                = toolkit.input.tobool( core.getInput( 'DRY_RUN' ) );
