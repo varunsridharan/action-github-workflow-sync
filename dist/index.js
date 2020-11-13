@@ -3351,10 +3351,10 @@ async function run() {
 						toolkit.log( error );
 					} );
 
+					await toolkit.git.add( path, `${workflow_file.dest}`, true );
 				} );
 			}
 		}
-
 		core.endGroup();
 		toolkit.log( '' );
 	} );
