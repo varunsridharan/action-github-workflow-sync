@@ -3080,10 +3080,8 @@ const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSI
 				path: `${GITHUB_WORKSPACE}/${LOCATION}`,
 				relative_path: `${LOCATION}`,
 				dest_type: 'workflow',
+				is_dir: await fs.lstatSync( dirPath ).isDirectory(),
 			}
-			//core.info( `	✅  ${GITHUB_WORKSPACE}/${LOCATION}` );
-		} else {
-			//core.info( `	🛑  ${GITHUB_WORKSPACE}/${LOCATION}` );
 		}
 	} );
 
@@ -3094,10 +3092,8 @@ const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSI
 					path: `${GITHUB_WORKSPACE}/${LOCATION}`,
 					relative_path: `${LOCATION}`,
 					dest_type: false,
+					is_dir: await fs.lstatSync( dirPath ).isDirectory(),
 				}
-				//core.info( `	✅  ${GITHUB_WORKSPACE}/${LOCATION}` );
-			} else {
-				//core.info( `	🛑  ${GITHUB_WORKSPACE}/${LOCATION}` );
 			}
 		} );
 	}
@@ -3192,7 +3188,7 @@ async function run() {
 					if( 'workflow' === dest_type ) {
 						workflow_file.dest = `.github/workflows/${workflow_file.dest}`
 					}
-
+					core.info( JSON.stringify( file_data ) );
 					gh.success( `	${relative_path} => ${workflow_file.dest}` )
 
 				} )
