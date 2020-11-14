@@ -32,6 +32,10 @@ inputs:
     description: "If set to true then all files are commited 1 by 1 instead of commiting everything @ once"
     required: false
     default: 'false'
+  PULL_REQUEST:
+    description: "Whether or not you want to do a pull request. Only works when branch name is provided. Default false"
+    required: false
+    default: 'false'
 
 runs:
   using: 'node12'
