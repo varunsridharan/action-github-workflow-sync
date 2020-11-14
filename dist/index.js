@@ -8824,7 +8824,7 @@ const createPullRequestBranch = async( work_dir, current_branch ) => {
 	let new_branch_name = `file-sync-${toolkit.input.env( 'GITHUB_RUN_NUMBER' )}-${current_branch}-${timestamp}`;
 	let status          = true;
 	await toolkit.exec( `git checkout -b ${new_branch_name}`, work_dir ).then( () => {
-		toolkit.log.success( `Pull Request Branch Created From ${current_branch}`, '	' );
+		toolkit.log.success( `Pull Request Branch "${new_branch_name}" Created From ${current_branch}`, '	' );
 	} ).catch( () => status = false );
 	return ( true === status ) ? new_branch_name : false;
 };
@@ -8914,10 +8914,16 @@ async function run() {
 		toolkit.log( `	Local Path  : ${local_path}` );
 		let status              = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
 		let modified            = [];
-		let current_branch      = ( PULL_REQUEST ) ? await toolkit.git.currentBranch( local_path ) : false;
-		let pull_request_branch = ( PULL_REQUEST ) ? await helper.createPullRequestBranch( local_path, current_branch ) : false;
+		let current_branch      = false;
+		let pull_request_branch = false;
 
 		if( status ) {
+
+			if( 'created' !== status ) {
+				current_branch      = ( PULL_REQUEST ) ? await toolkit.git.currentBranch( local_path ) : false;
+				pull_request_branch = ( PULL_REQUEST ) ? await helper.createPullRequestBranch( local_path, current_branch ) : false;
+			}
+
 			let identity_status = await toolkit.git.identity( local_path, __webpack_require__(3424).GIT_USER, __webpack_require__(3424).GIT_EMAIL, true );
 			if( identity_status ) {
 				await toolkit.asyncForEach( WORKFLOW_FILES, async function( raw_workflow_file ) {
@@ -8973,7 +8979,7 @@ async function run() {
 						if( COMMIT_EACH_FILE ) {
 							let haschange = await toolkit.git.hasChange( local_path, true );
 							if( '' === haschange ) {
-								toolkit.log.green( 'No changes detected', '	' );
+								toolkit.log.green( '	No changes detected' );
 							} else if( false !== haschange ) {
 								await helper.commitfile( local_path );
 								modified.push( `${workflow_file.dest}` );
@@ -9006,7 +9012,7 @@ async function run() {
 						let pushh_status = await toolkit.git.push( local_path, git_url, false, true );
 						toolkit.log( JSON.stringify( pushh_status ) );
 
-						if( PULL_REQUEST ) {
+						if( 'created' !== status && PULL_REQUEST ) {
 							const octokit = github.getOctokit( GITHUB_TOKEN );
 							let response  = await octokit.pulls.create( {
 								owner: owner,
@@ -9018,6 +9024,8 @@ async function run() {
 							toolkit.log( JSON.stringify( response ) );
 						}
 						toolkit.log( '---------------------------------------------------' );
+					} else {
+						toolkit.log.success( 'Nothing To Push', '	' );
 					}
 				}
 			}
