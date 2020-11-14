@@ -9013,15 +9013,15 @@ async function run() {
 						toolkit.log( JSON.stringify( pushh_status ) );
 
 						if( 'created' !== status && PULL_REQUEST ) {
-							const octokit = github.getOctokit( GITHUB_TOKEN );
-							let response  = await octokit.pulls.create( {
+							const octokit             = github.getOctokit( GITHUB_TOKEN );
+							let { data: pullrequest } = await octokit.pulls.create( {
 								owner: owner,
 								repo: repository,
 								title: `Files Sync From ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`,
 								head: pull_request_branch,
 								base: current_branch,
 							} );
-							toolkit.log( JSON.stringify( response ) );
+							toolkit.log( JSON.stringify( pullrequest ) );
 						}
 						toolkit.log( '---------------------------------------------------' );
 					} else {
