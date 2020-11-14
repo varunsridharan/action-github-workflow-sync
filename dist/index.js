@@ -4829,15 +4829,15 @@ const log      = __webpack_require__( 5039 );
 
 module.exports = async( work_dir, repository_url, args = false, show_log = true ) => {
 	let status = true;
-	let cmd    = `git push "${repository_url}" `;
+	let cmd    = `git push "${repository_url}"`;
 
-	if( false !== args ) {
+	if( args ) {
 		cmd += ` ${args} `;
 	}
 
 	await nodeexec( `${cmd}`, work_dir ).then( ( response ) => {
 		if( show_log ) {
-			log.success( `${response}` );
+			log( `${response}` );
 		}
 	} ).catch( ( error ) => {
 		if( show_log ) {
@@ -9003,8 +9003,8 @@ async function run() {
 						await helper.commitfile( local_path );
 					}
 
-					let push_status = await helper.gitPush( local_path, git_url );
-					toolkit.log( push_status );
+					await toolkit.git.push( local_path, git_url, false, true );
+
 
 					if( PULL_REQUEST ) {
 						const octokit = github.getOctokit( GITHUB_TOKEN );
