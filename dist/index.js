@@ -8952,7 +8952,7 @@ async function run() {
 						if( COMMIT_EACH_FILE ) {
 							let haschange = await toolkit.git.hasChange( local_path, true );
 							if( '' === haschange ) {
-								toolkit.log.success( 'No Changes Are Done :', '	' );
+								toolkit.log.green( 'No changes detected', '	' );
 							} else if( false !== haschange ) {
 								await helper.commitfile( local_path );
 							}
@@ -8981,10 +8981,10 @@ async function run() {
 						await helper.commitfile( local_path );
 					}
 
-					if( PULL_REQUEST && ( false !== haschange && '' !== haschange ) ) {
-						let push_status = await toolkit.git.push( local_path, git_url );
-						toolkit.log( push_status );
+					let push_status = await toolkit.git.push( local_path, git_url );
+					toolkit.log( push_status );
 
+					if( PULL_REQUEST ) {
 						const octokit = github.getOctokit( GITHUB_TOKEN );
 						let response  = await octokit.pulls.create( {
 							owner: owner,
@@ -8995,9 +8995,6 @@ async function run() {
 						} );
 						toolkit.log( response );
 
-					} else {
-						let push_status = await toolkit.git.push( local_path, git_url );
-						toolkit.log( push_status );
 					}
 
 					toolkit.log( '---------------------------------------------------' );
