@@ -8980,9 +8980,10 @@ async function run() {
 					} else if( false !== haschange && !COMMIT_EACH_FILE ) {
 						await helper.commitfile( local_path );
 					}
-					toolkit.log( 'haschange : ' + haschange );
+					toolkit.log( await toolkit.git.stats( local_path ) );
 					let push_status = await toolkit.git.push( local_path, git_url );
 					toolkit.log( push_status );
+					toolkit.log( await toolkit.git.stats( local_path ) );
 
 					if( PULL_REQUEST ) {
 						const octokit = github.getOctokit( GITHUB_TOKEN );
