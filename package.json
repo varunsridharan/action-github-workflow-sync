@@ -4,7 +4,8 @@
  "description": "Github Action To Sync Github Action's Workflow Files Across Repositories",
  "main": "src/index.js",
  "scripts": {
-  "prepare": "ncc build src/index.js -o dist --source-map --license licenses.txt"
+  "prepare": "ncc build src/index.js -o dist --source-map --license licenses.txt ",
+  "prepare-git": "ncc build src/index.js -o dist --source-map --license licenses.txt && git add -f ./dist/** && git commit -m \"Updated\" && git push "
  },
  "repository": {
   "type": "git",
@@ -22,11 +23,10 @@
  },
  "homepage": "https://github.com/actions/javascript-action#readme",
  "dependencies": {
-  "@actions/core": "^1.2.5"
+  "actions-js-toolkit": "^0.0.10",
+  "@actions/github": "^4.0.0"
  },
  "devDependencies": {
-  "@vercel/ncc": "^0.24.0",
-  "eslint": "^7.4.0",
-  "jest": "^26.1.0"
+  "@vercel/ncc": "^0.24.0"
  }
 }
