@@ -9006,11 +9006,10 @@ async function run() {
 						modified.push( local_path );
 					}
 
+					toolkit.log.green( log_msg );
+					toolkit.log( '---------------------------------------------------' );
 					if( modified.length > 0 ) {
-						toolkit.log.green( log_msg );
-						toolkit.log( '---------------------------------------------------' );
 						let pushh_status = await toolkit.git.push( local_path, git_url, false, true );
-
 						if( false !== pushh_status && 'created' !== status && PULL_REQUEST ) {
 							const octokit             = github.getOctokit( GITHUB_TOKEN );
 							let { data: pullrequest } = await octokit.pulls.create( {
@@ -9023,10 +9022,11 @@ async function run() {
 							toolkit.log.green( `Pull Request Created : #${pullrequest.number}` );
 							toolkit.log( `${pullrequest.html_url}` );
 						}
-						toolkit.log( '---------------------------------------------------' );
+
 					} else {
 						toolkit.log.success( 'Nothing To Push' );
 					}
+					toolkit.log( '---------------------------------------------------' );
 				}
 			}
 		}
