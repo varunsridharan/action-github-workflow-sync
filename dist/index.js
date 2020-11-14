@@ -8995,8 +8995,8 @@ async function run() {
 							head: pull_request_branch,
 							base: current_branch,
 						} );
+						toolkit.log( response );
 					}
-					toolkit.log( response );
 					toolkit.log( '---------------------------------------------------' );
 				}
 
