@@ -1690,7 +1690,16 @@ const stats     = __webpack_require__( 965 );
 const commit    = __webpack_require__( 352 );
 const push      = __webpack_require__( 23 );
 
-module.exports = { identity, add, stats, hasChange, commit, push };
+const nodeexec = __webpack_require__( 476 );
+
+const currentBranch = async( work_dir ) => {
+	let status = true;
+	let cmd    = 'git branch --show-current';
+	await nodeexec( `${cmd}`, work_dir ).then( ( response ) => status = response ).catch( ( error ) => status = false );
+	return status;
+};
+
+module.exports = { identity, add, stats, hasChange, commit, push, currentBranch };
 
 
 
@@ -1758,17 +1767,7 @@ const path         = __webpack_require__( 787 );
 const asyncForEach = __webpack_require__( 763 );
 const input        = __webpack_require__( 80 );
 
-const nodeexec = __webpack_require__( 328 );
-
-const currentBranch = async( work_dir ) => {
-	let status = true;
-	let cmd    = 'git branch --show-current';
-	await nodeexec( `${cmd}`, work_dir ).then( ( response ) => status = response ).catch( ( error ) => status = false );
-	return status;
-};
-
-
-module.exports = { log, exec, git, path, asyncForEach, input, currentBranch };
+module.exports = { log, exec, git, path, asyncForEach, input };
 
 
 /***/ }),
@@ -3596,14 +3595,6 @@ module.exports = {
 	WORKSPACE,
 	GITHUB_WORKSPACE,
 };
-
-/***/ }),
-
-/***/ 328:
-/***/ ((module) => {
-
-module.exports = eval("require")("../node-exec");
-
 
 /***/ }),
 
