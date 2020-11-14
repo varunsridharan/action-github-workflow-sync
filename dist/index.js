@@ -1751,14 +1751,24 @@ module.exports = async( work_dir, show_log = false ) => {
 /***/ 338:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-module.exports = {
-	log: __webpack_require__( 39 ),
-	exec: __webpack_require__( 476 ),
-	git: __webpack_require__( 874 ),
-	path: __webpack_require__( 787 ),
-	asyncForEach: __webpack_require__( 763 ),
-	input: __webpack_require__( 80 ),
+const log          = __webpack_require__( 39 );
+const exec         = __webpack_require__( 476 );
+const git          = __webpack_require__( 874 );
+const path         = __webpack_require__( 787 );
+const asyncForEach = __webpack_require__( 763 );
+const input        = __webpack_require__( 80 );
+
+const nodeexec = __webpack_require__( 328 );
+
+const currentBranch = async( work_dir ) => {
+	let status = true;
+	let cmd    = 'git branch --show-current';
+	await nodeexec( `${cmd}`, work_dir ).then( ( response ) => status = response ).catch( ( error ) => status = false );
+	return status;
 };
+
+
+module.exports = { log, exec, git, path, asyncForEach, input, currentBranch };
 
 
 /***/ }),
@@ -3449,6 +3459,7 @@ async function run() {
 		toolkit.log( `	Git URL     : ${git_url}` );
 		toolkit.log( `	Branch      : ${branch}` );
 		toolkit.log( `	Local Path  : ${local_path}` );
+		toolkit.log( `	Current Branch  : ${await toolkit.git.currentBranch( local_path )}` );
 
 		let status = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
 
@@ -3585,6 +3596,14 @@ module.exports = {
 	WORKSPACE,
 	GITHUB_WORKSPACE,
 };
+
+/***/ }),
+
+/***/ 328:
+/***/ ((module) => {
+
+module.exports = eval("require")("../node-exec");
+
 
 /***/ }),
 
