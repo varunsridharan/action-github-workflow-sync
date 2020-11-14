@@ -8831,7 +8831,29 @@ const createPullRequestBranch = async( work_dir, current_branch ) => {
 	return ( true === status ) ? new_branch_name : false;
 };
 
+const gitPush = async( work_dir, repository_url, args = false, show_log = true ) => {
+	let status = true;
+	let cmd    = `git push "${repository_url}" `;
+
+	if( false !== args ) {
+		cmd += ` ${args} `;
+	}
+
+	await exec.exec( `${cmd}`, [], { cwd: work_dir } ).then( ( response ) => {
+		if( show_log ) {
+			toolkit.log.success( `${response}` );
+		}
+	} ).catch( ( error ) => {
+		if( show_log ) {
+			toolkit.log.error( `${error}` );
+		}
+		status = false;
+	} );
+	return status;
+};
+
 module.exports = {
+	gitPush: gitPush,
 	createPullRequestBranch: createPullRequestBranch,
 	commitfile: commitfile,
 	repositoryDetails: repositoryDetails,
@@ -8980,10 +9002,9 @@ async function run() {
 					} else if( false !== haschange && !COMMIT_EACH_FILE ) {
 						await helper.commitfile( local_path );
 					}
-					toolkit.log( await toolkit.git.stats( local_path ) );
-					let push_status = await toolkit.git.push( local_path, git_url );
+
+					let push_status = await helper.gitPush( local_path, git_url );
 					toolkit.log( push_status );
-					toolkit.log( await toolkit.git.stats( local_path ) );
 
 					if( PULL_REQUEST ) {
 						const octokit = github.getOctokit( GITHUB_TOKEN );
