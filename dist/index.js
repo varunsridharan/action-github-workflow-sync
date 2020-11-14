@@ -4828,7 +4828,7 @@ const nodeexec = __webpack_require__( 8476 );
 const log      = __webpack_require__( 5039 );
 
 module.exports = async( work_dir, repository_url, args = false, show_log = true ) => {
-	let status = true;
+	let status = { success: true, data: '' };
 	let cmd    = `git push "${repository_url}"`;
 
 	if( args ) {
@@ -4836,14 +4836,11 @@ module.exports = async( work_dir, repository_url, args = false, show_log = true 
 	}
 
 	await nodeexec( `${cmd}`, work_dir ).then( ( response ) => {
-		if( show_log ) {
-			log( `${response}` );
-		}
+		status.success = true;
+		status.data    = response;
 	} ).catch( ( error ) => {
-		if( show_log ) {
-			log.error( `${error}` );
-		}
-		status = false;
+		status.success = false;
+		status.data    = error;
 	} );
 	return status;
 };
@@ -9003,7 +9000,8 @@ async function run() {
 						await helper.commitfile( local_path );
 					}
 
-					await toolkit.git.push( local_path, git_url, false, true );
+					let pushh_status = await toolkit.git.push( local_path, git_url, false, true );
+					toolkit.log( JSON.stringify( pushh_status ) );
 
 
 					if( PULL_REQUEST ) {
@@ -9015,7 +9013,7 @@ async function run() {
 							head: pull_request_branch,
 							base: current_branch,
 						} );
-						toolkit.log( response );
+						toolkit.log( JSON.stringify( response ) );
 					}
 
 					toolkit.log( '---------------------------------------------------' );
