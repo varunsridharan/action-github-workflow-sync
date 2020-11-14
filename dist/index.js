@@ -8980,7 +8980,7 @@ async function run() {
 					} else if( false !== haschange && !COMMIT_EACH_FILE ) {
 						await helper.commitfile( local_path );
 					}
-
+					toolkit.log( 'haschange : ' + haschange );
 					let push_status = await toolkit.git.push( local_path, git_url );
 					toolkit.log( push_status );
 
@@ -8994,7 +8994,6 @@ async function run() {
 							base: current_branch,
 						} );
 						toolkit.log( response );
-
 					}
 
 					toolkit.log( '---------------------------------------------------' );
