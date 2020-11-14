@@ -3477,7 +3477,7 @@ async function run() {
 		let current_branch = await toolkit.git.currentBranch( local_path );
 		toolkit.log( '' );
 		toolkit.log( `	Current Branch  : ${current_branch}` );
-		await helper.createPullRequestBranch();
+		toolkit.log( await helper.createPullRequestBranch( local_path ) );
 
 		if( status ) {
 			let identity_status = await toolkit.git.identity( local_path, __webpack_require__(424).GIT_USER, __webpack_require__(424).GIT_EMAIL, true );
