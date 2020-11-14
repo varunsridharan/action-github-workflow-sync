@@ -4836,7 +4836,7 @@ module.exports = async( work_dir, repository_url, args = false, show_log = true 
 		cmd += ` ${args} `;
 	}
 
-	await exec( `${cmd}`, [], { cwd: work_dir } ).then( ( response ) => {
+	await exec.exec( `${cmd}`, [], { cwd: work_dir } ).then( ( response ) => {
 		status.success = true;
 		status.data    = response;
 	} ).catch( ( error ) => {
