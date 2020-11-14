@@ -9003,7 +9003,7 @@ async function run() {
 					}
 
 
-					const git_status = await toolkit.git.stats( local_path );
+					const git_status = await toolkit.git.push( local_path, git_url, ' --dry-run' );
 					toolkit.log( git_status );
 
 					//let pushh_status = await toolkit.git.push( local_path, git_url, false, true );
