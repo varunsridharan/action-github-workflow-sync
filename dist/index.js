@@ -1711,6 +1711,7 @@ module.exports = async( work_dir, repository_url, args = false, show_log = true 
 	}
 
 	await nodeexec( `${cmd}`, work_dir ).then( ( response ) => {
+		status = response;
 		if( show_log ) {
 			log.success( `${response}` );
 		}
@@ -3526,7 +3527,7 @@ async function run() {
 				} else {
 					let log_msg = ( false === COMMIT_EACH_FILE ) ? 'Git Commit & Push Log' : 'Git Push Log';
 					toolkit.log.green( log_msg );
-
+					toolkit.log( '---------------------------------------------------' );
 					if( !COMMIT_EACH_FILE ) {
 						let haschange = await toolkit.git.hasChange( local_path, true );
 						if( '' === haschange ) {
@@ -3535,7 +3536,9 @@ async function run() {
 							await helper.commitfile( local_path );
 						}
 					}
-					await toolkit.git.push( local_path, git_url );
+					let push_status = await toolkit.git.push( local_path, git_url );
+					toolkit.log( push_status );
+					toolkit.log( '---------------------------------------------------' );
 				}
 
 			}
