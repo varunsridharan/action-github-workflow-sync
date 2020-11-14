@@ -8950,7 +8950,7 @@ async function run() {
 					workflow_file.dest = ( 'workflow' === dest_type ) ? `.github/workflows/${workflow_file.dest}` : workflow_file.dest;
 
 					if( workflow_file.type === 'once' && await toolkit.path.exists( `${local_path}${workflow_file.dest}` ) ) {
-						toolkit.log.blue( '	File/Folder Already Exists' );
+						toolkit.log.warn( '	File/Folder Already Exists' );
 						toolkit.log( '' );
 						return;
 					}
