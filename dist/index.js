@@ -1630,6 +1630,36 @@ module.exports = async( work_dir, message, force_or_args = false, show_log = tru
 
 /***/ }),
 
+/***/ 511:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const nodeexec = __webpack_require__( 476 );
+
+module.exports = async( work_dir ) => {
+	let status = true;
+	let cmd    = 'git branch --show-current';
+	await nodeexec( `${cmd}`, work_dir ).then( ( response ) => status = response ).catch( () => status = false );
+	return status;
+};
+
+
+/***/ }),
+
+/***/ 9:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const nodeexec = __webpack_require__( 476 );
+
+module.exports = async( work_dir ) => {
+	let status = true;
+	let cmd    = 'git branch --no-color --list --no-column';
+	await nodeexec( `${cmd}`, work_dir ).then( ( response ) => status = response ).catch( () => status = false );
+	return status;
+};
+
+
+/***/ }),
+
 /***/ 417:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -1683,23 +1713,16 @@ module.exports = async( GIT_PATH, GIT_USER, GIT_EMAIL, LOG = true ) => {
 /***/ 874:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const identity  = __webpack_require__( 876 );
-const add       = __webpack_require__( 231 );
-const hasChange = __webpack_require__( 417 );
-const stats     = __webpack_require__( 965 );
-const commit    = __webpack_require__( 352 );
-const push      = __webpack_require__( 23 );
+const identity       = __webpack_require__( 876 );
+const add            = __webpack_require__( 231 );
+const hasChange      = __webpack_require__( 417 );
+const stats          = __webpack_require__( 965 );
+const commit         = __webpack_require__( 352 );
+const push           = __webpack_require__( 23 );
+const currentBranch  = __webpack_require__( 511 );
+const getAllBranches = __webpack_require__( 9 );
 
-const nodeexec = __webpack_require__( 476 );
-
-const currentBranch = async( work_dir ) => {
-	let status = true;
-	let cmd    = 'git branch --show-current';
-	await nodeexec( `${cmd}`, work_dir ).then( ( response ) => status = response ).catch( ( error ) => status = false );
-	return status;
-};
-
-module.exports = { identity, add, stats, hasChange, commit, push, currentBranch };
+module.exports = { identity, add, stats, hasChange, commit, push, currentBranch, getAllBranches };
 
 
 
@@ -1720,7 +1743,6 @@ module.exports = async( work_dir, repository_url, args = false, show_log = true 
 	}
 
 	await nodeexec( `${cmd}`, work_dir ).then( ( response ) => {
-		status = response;
 		if( show_log ) {
 			log.success( `${response}` );
 		}
@@ -3405,6 +3427,8 @@ const commitfile = async( local_path ) => {
 };
 
 const createPullRequestBranch = async( work_dir ) => {
+	let all_branches = await toolkit.git.getAllBranches( work_dir );
+	toolkit.log( all_branches );
 	let timestamp       = Math.round( ( new Date() ).getTime() / 1000 );
 	let new_branch_name = `file-sync-${toolkit.input.env( 'GITHUB_RUN_NUMBER' )}-${timestamp}`;
 	let status          = true;
