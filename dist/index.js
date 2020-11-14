@@ -8892,7 +8892,9 @@ async function run() {
 		toolkit.log( `	Git URL     : ${git_url}` );
 		toolkit.log( `	Branch      : ${branch}` );
 		toolkit.log( `	Local Path  : ${local_path}` );
-		let status = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
+		let status              = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
+		let current_branch      = ( PULL_REQUEST ) ? await toolkit.git.currentBranch( local_path ) : false;
+		let pull_request_branch = ( PULL_REQUEST ) ? await helper.createPullRequestBranch( local_path, current_branch ) : false;
 
 		if( status ) {
 			let identity_status = await toolkit.git.identity( local_path, __webpack_require__(3424).GIT_USER, __webpack_require__(3424).GIT_EMAIL, true );
@@ -8980,9 +8982,7 @@ async function run() {
 					}
 
 					if( PULL_REQUEST && ( false !== haschange && '' !== haschange ) ) {
-						let current_branch      = await toolkit.git.currentBranch( local_path );
-						let pull_request_branch = await helper.createPullRequestBranch( local_path, current_branch );
-						let push_status         = await toolkit.git.push( local_path, git_url );
+						let push_status = await toolkit.git.push( local_path, git_url );
 						toolkit.log( push_status );
 
 						const octokit = github.getOctokit( GITHUB_TOKEN );
