@@ -3458,9 +3458,9 @@ async function run() {
 		toolkit.log( `	Git URL     : ${git_url}` );
 		toolkit.log( `	Branch      : ${branch}` );
 		toolkit.log( `	Local Path  : ${local_path}` );
-		toolkit.log( `	Current Branch  : ${await toolkit.git.currentBranch( local_path )}` );
-
 		let status = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
+
+		toolkit.log( `	Current Branch  : ${await toolkit.git.currentBranch( local_path )}` );
 
 		if( status ) {
 			let identity_status = await toolkit.git.identity( local_path, __webpack_require__(424).GIT_USER, __webpack_require__(424).GIT_EMAIL, true );
