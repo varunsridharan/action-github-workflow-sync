@@ -3426,13 +3426,13 @@ const commitfile = async( local_path ) => {
 	return await toolkit.git.commit( local_path, message );
 };
 
-const createPullRequestBranch = async( work_dir ) => {
-	let all_branches = await toolkit.git.getAllBranches( work_dir );
-	toolkit.log( all_branches );
+const createPullRequestBranch = async( work_dir, current_branch ) => {
 	let timestamp       = Math.round( ( new Date() ).getTime() / 1000 );
-	let new_branch_name = `file-sync-${toolkit.input.env( 'GITHUB_RUN_NUMBER' )}-${timestamp}`;
+	let new_branch_name = `file-sync-${toolkit.input.env( 'GITHUB_RUN_NUMBER' )}-${current_branch}-${timestamp}`;
 	let status          = true;
-	await toolkit.exec( `git checkout -b ${new_branch_name}`, work_dir ).catch( () => status = false );
+	await toolkit.exec( `git checkout -b ${new_branch_name}`, work_dir ).then( () => {
+		toolkit.log.success( `Pull Request Branch Created From ${current_branch}`, '	' );
+	} ).catch( () => status = false );
 	return ( true === status ) ? new_branch_name : false;
 };
 
@@ -3501,7 +3501,7 @@ async function run() {
 		let current_branch = await toolkit.git.currentBranch( local_path );
 		toolkit.log( '' );
 		toolkit.log( `	Current Branch  : ${current_branch}` );
-		toolkit.log( await helper.createPullRequestBranch( local_path ) );
+		toolkit.log( await helper.createPullRequestBranch( local_path, current_branch ) );
 
 		if( status ) {
 			let identity_status = await toolkit.git.identity( local_path, __webpack_require__(424).GIT_USER, __webpack_require__(424).GIT_EMAIL, true );
