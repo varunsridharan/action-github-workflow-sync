@@ -3281,7 +3281,7 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 				  .then( () => toolkit.log.success( `Repository Branch ${branch} Cloned`, '	' ) )
 				  .catch( async() => {
 					  if( false !== auto_create_branch ) {
-						  toolkit.log.warn( 'Branch Not found' );
+						  toolkit.log.warn( 'Branch Not found', '	' );
 						  await exec.exec( `git clone ${common_arg} ${git_url} "${local_path}"`, [], options )
 									.then( async() => {
 										await toolkit.exec( `git checkout -b ${branch}`, local_path )
@@ -3478,7 +3478,7 @@ async function run() {
 					workflow_file.dest = ( 'workflow' === dest_type ) ? `.github/workflows/${workflow_file.dest}` : workflow_file.dest;
 
 					if( workflow_file.type === 'once' && await toolkit.path.exists( `${local_path}${workflow_file.dest}` ) ) {
-						toolkit.log.green( '	File Already Exists' );
+						toolkit.log.green( '	File/Folder Already Exists' );
 						toolkit.log( '' );
 						return;
 					}
@@ -3535,7 +3535,7 @@ async function run() {
 							await helper.commitfile( local_path );
 						}
 					}
-					await toolkit.git.push( local_path, git_url );
+					//await toolkit.git.push( local_path, git_url );
 				}
 
 			}
