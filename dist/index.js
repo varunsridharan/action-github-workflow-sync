@@ -8867,6 +8867,7 @@ async function run() {
 	toolkit.log( '⚙️ Basic Config' );
 	toolkit.log( `  * AUTO_CREATE_NEW_BRANCH     : ${AUTO_CREATE_NEW_BRANCH}` );
 	toolkit.log( `  * COMMIT_EACH_FILE           : ${COMMIT_EACH_FILE}` );
+	toolkit.log( `  * PULL_REQUEST               : ${PULL_REQUEST}` );
 	toolkit.log( `  * DRY_RUN                    : ${DRY_RUN}` );
 	toolkit.log( `  * WORKFLOW_FILES_DIR         : ${WORKFLOW_FILES_DIR}` );
 	toolkit.log( `  * WORKSPACE                  : ${WORKSPACE}` );
