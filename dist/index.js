@@ -8913,6 +8913,7 @@ async function run() {
 		toolkit.log( `	Branch      : ${branch}` );
 		toolkit.log( `	Local Path  : ${local_path}` );
 		let status              = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
+		let modified            = [];
 		let current_branch      = ( PULL_REQUEST ) ? await toolkit.git.currentBranch( local_path ) : false;
 		let pull_request_branch = ( PULL_REQUEST ) ? await helper.createPullRequestBranch( local_path, current_branch ) : false;
 
@@ -8975,9 +8976,9 @@ async function run() {
 								toolkit.log.green( 'No changes detected', '	' );
 							} else if( false !== haschange ) {
 								await helper.commitfile( local_path );
+								modified.push( `${workflow_file.dest}` );
 							}
 						}
-
 					} );
 
 					toolkit.log( ' ' );
@@ -8992,39 +8993,33 @@ async function run() {
 				} else {
 					let haschange = await toolkit.git.hasChange( local_path, true );
 					let log_msg   = ( false === COMMIT_EACH_FILE ) ? 'Git Commit & Push Log' : 'Git Push Log';
+					if( modified.length > 0 ) {
+						toolkit.log.green( log_msg );
+						toolkit.log( '---------------------------------------------------' );
+						if( '' === haschange && !COMMIT_EACH_FILE ) {
+							toolkit.log.success( 'No Changes Are Done :', '	' );
+						} else if( false !== haschange && !COMMIT_EACH_FILE ) {
+							await helper.commitfile( local_path );
+						}
 
-					toolkit.log.green( log_msg );
-					toolkit.log( '---------------------------------------------------' );
+						let pushh_status = await toolkit.git.push( local_path, git_url, false, true );
+						toolkit.log( JSON.stringify( pushh_status ) );
 
-					if( '' === haschange && !COMMIT_EACH_FILE ) {
-						toolkit.log.success( 'No Changes Are Done :', '	' );
-					} else if( false !== haschange && !COMMIT_EACH_FILE ) {
-						await helper.commitfile( local_path );
+						if( PULL_REQUEST ) {
+							const octokit = github.getOctokit( GITHUB_TOKEN );
+							let response  = await octokit.pulls.create( {
+								owner: owner,
+								repo: repository,
+								title: `Files Sync From ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`,
+								head: pull_request_branch,
+								base: current_branch,
+							} );
+							toolkit.log( JSON.stringify( response ) );
+						}
+
+						toolkit.log( '---------------------------------------------------' );
 					}
-
-
-					const git_status = await toolkit.git.push( local_path, git_url, ' --dry-run' );
-					toolkit.log( git_status );
-
-					//let pushh_status = await toolkit.git.push( local_path, git_url, false, true );
-					//toolkit.log( JSON.stringify( pushh_status ) );
-
-
-					/*if( PULL_REQUEST ) {
-						const octokit = github.getOctokit( GITHUB_TOKEN );
-						let response  = await octokit.pulls.create( {
-							owner: owner,
-							repo: repository,
-							title: `Files Sync From ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`,
-							head: pull_request_branch,
-							base: current_branch,
-						} );
-						toolkit.log( JSON.stringify( response ) );
-					}*/
-
-					toolkit.log( '---------------------------------------------------' );
 				}
-
 			}
 		}
 		core.endGroup();
