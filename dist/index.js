@@ -9025,7 +9025,7 @@ async function run() {
 						}
 						toolkit.log( '---------------------------------------------------' );
 					} else {
-						toolkit.log.success( 'Nothing To Push', '	' );
+						toolkit.log.success( 'Nothing To Push' );
 					}
 				}
 			}
