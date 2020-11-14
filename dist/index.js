@@ -8983,6 +8983,7 @@ async function run() {
 					toolkit.log( ' ' );
 				} );
 
+
 				if( DRY_RUN ) {
 					toolkit.log.warning( 'No Changes Are Pushed' );
 					toolkit.log( 'Git Status' );
@@ -9001,11 +9002,15 @@ async function run() {
 						await helper.commitfile( local_path );
 					}
 
-					let pushh_status = await toolkit.git.push( local_path, git_url, false, true );
-					toolkit.log( JSON.stringify( pushh_status ) );
+
+					const git_status = await toolkit.git.stats( local_path );
+					toolkit.log( git_status );
+
+					//let pushh_status = await toolkit.git.push( local_path, git_url, false, true );
+					//toolkit.log( JSON.stringify( pushh_status ) );
 
 
-					if( PULL_REQUEST ) {
+					/*if( PULL_REQUEST ) {
 						const octokit = github.getOctokit( GITHUB_TOKEN );
 						let response  = await octokit.pulls.create( {
 							owner: owner,
@@ -9015,7 +9020,7 @@ async function run() {
 							base: current_branch,
 						} );
 						toolkit.log( JSON.stringify( response ) );
-					}
+					}*/
 
 					toolkit.log( '---------------------------------------------------' );
 				}
