@@ -8892,13 +8892,7 @@ async function run() {
 		toolkit.log( `	Git URL     : ${git_url}` );
 		toolkit.log( `	Branch      : ${branch}` );
 		toolkit.log( `	Local Path  : ${local_path}` );
-		let status              = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
-		let pull_request_branch = false;
-		let current_branch      = false;
-		if( PULL_REQUEST ) {
-			current_branch      = await toolkit.git.currentBranch( local_path );
-			pull_request_branch = await helper.createPullRequestBranch( local_path, current_branch );
-		}
+		let status = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
 
 		if( status ) {
 			let identity_status = await toolkit.git.identity( local_path, __webpack_require__(3424).GIT_USER, __webpack_require__(3424).GIT_EMAIL, true );
@@ -8973,31 +8967,39 @@ async function run() {
 					toolkit.log( await toolkit.git.stats( local_path ) );
 					toolkit.log( ' ' );
 				} else {
-					let log_msg = ( false === COMMIT_EACH_FILE ) ? 'Git Commit & Push Log' : 'Git Push Log';
+					let haschange = await toolkit.git.hasChange( local_path, true );
+					let log_msg   = ( false === COMMIT_EACH_FILE ) ? 'Git Commit & Push Log' : 'Git Push Log';
+
 					toolkit.log.green( log_msg );
 					toolkit.log( '---------------------------------------------------' );
-					if( !COMMIT_EACH_FILE ) {
-						let haschange = await toolkit.git.hasChange( local_path, true );
-						if( '' === haschange ) {
-							toolkit.log.success( 'No Changes Are Done :', '	' );
-						} else if( false !== haschange ) {
-							await helper.commitfile( local_path );
-						}
-					}
-					let push_status = await toolkit.git.push( local_path, git_url );
-					toolkit.log( push_status );
 
-					if( PULL_REQUEST ) {
+					if( '' === haschange && !COMMIT_EACH_FILE ) {
+						toolkit.log.success( 'No Changes Are Done :', '	' );
+					} else if( false !== haschange && !COMMIT_EACH_FILE ) {
+						await helper.commitfile( local_path );
+					}
+
+					if( PULL_REQUEST && ( false !== haschange && '' !== haschange ) ) {
+						let current_branch      = await toolkit.git.currentBranch( local_path );
+						let pull_request_branch = await helper.createPullRequestBranch( local_path, current_branch );
+						let push_status         = await toolkit.git.push( local_path, git_url );
+						toolkit.log( push_status );
+
 						const octokit = github.getOctokit( GITHUB_TOKEN );
 						let response  = await octokit.pulls.create( {
-							owner,
+							owner: owner,
 							repo: repository,
 							title: `Files Sync From ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`,
 							head: pull_request_branch,
 							base: current_branch,
 						} );
 						toolkit.log( response );
+
+					} else {
+						let push_status = await toolkit.git.push( local_path, git_url );
+						toolkit.log( push_status );
 					}
+
 					toolkit.log( '---------------------------------------------------' );
 				}
 
