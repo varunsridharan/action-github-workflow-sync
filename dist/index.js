@@ -3275,6 +3275,10 @@ const repositoryDetails = ( input_repo ) => {
 	};
 };
 
+const createBranch = async() => {
+
+};
+
 const repositoryClone = async( git_url, local_path, branch, auto_create_branch ) => {
 	const common_arg = '--quiet --no-hardlinks --no-tags';
 	const options    = { silent: true };
@@ -3400,7 +3404,16 @@ const commitfile = async( local_path ) => {
 	return await toolkit.git.commit( local_path, message );
 };
 
+const createPullRequestBranch = async( work_dir ) => {
+	let timestamp       = Math.round( ( new Date() ).getTime() / 1000 );
+	let new_branch_name = `file-sync-${toolkit.input.env( 'GITHUB_RUN_NUMBER' )}-${timestamp}`;
+	let status          = true;
+	await toolkit.exec( `git checkout -b ${new_branch_name}`, work_dir ).catch( () => status = false );
+	return ( true === status ) ? new_branch_name : false;
+};
+
 module.exports = {
+	createPullRequestBranch: createPullRequestBranch,
 	commitfile: commitfile,
 	repositoryDetails: repositoryDetails,
 	repositoryClone: repositoryClone,
@@ -3428,6 +3441,7 @@ async function run() {
 	let WORKSPACE              = __webpack_require__(424).WORKSPACE;
 	let REPOSITORIES           = __webpack_require__(424).REPOSITORIES;
 	let WORKFLOW_FILES         = __webpack_require__(424).WORKFLOW_FILES;
+	let PULL_REQUEST           = __webpack_require__(424).PULL_REQUEST;
 
 	toolkit.log( '-------------------------------------------------------' );
 	toolkit.log( '⚙️ Basic Config' );
@@ -3460,7 +3474,10 @@ async function run() {
 		toolkit.log( `	Local Path  : ${local_path}` );
 		let status = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
 
-		toolkit.log( `	Current Branch  : ${await toolkit.git.currentBranch( local_path )}` );
+		let current_branch = await toolkit.git.currentBranch( local_path );
+		toolkit.log( '' );
+		toolkit.log( `	Current Branch  : ${current_branch}` );
+		await helper.createPullRequestBranch();
 
 		if( status ) {
 			let identity_status = await toolkit.git.identity( local_path, __webpack_require__(424).GIT_USER, __webpack_require__(424).GIT_EMAIL, true );
@@ -3546,8 +3563,8 @@ async function run() {
 							await helper.commitfile( local_path );
 						}
 					}
-					let push_status = await toolkit.git.push( local_path, git_url );
-					toolkit.log( push_status );
+					//let push_status = await toolkit.git.push( local_path, git_url );
+					//toolkit.log( push_status );
 					toolkit.log( '---------------------------------------------------' );
 				}
 
@@ -3571,6 +3588,7 @@ const toolkit = __webpack_require__( 338 );
 const AUTO_CREATE_NEW_BRANCH = toolkit.input.tobool( core.getInput( 'AUTO_CREATE_NEW_BRANCH' ) );
 const COMMIT_EACH_FILE       = toolkit.input.tobool( core.getInput( 'COMMIT_EACH_FILE' ) );
 const DRY_RUN                = toolkit.input.tobool( core.getInput( 'DRY_RUN' ) );
+const PULL_REQUEST           = toolkit.input.tobool( core.getInput( 'PULL_REQUEST' ) );
 const GITHUB_TOKEN           = core.getInput( 'GITHUB_TOKEN' );
 const RAW_REPOSITORIES       = core.getInput( 'REPOSITORIES' );
 const RAW_WORKFLOW_FILES     = core.getInput( 'WORKFLOW_FILES' );
@@ -3588,6 +3606,7 @@ module.exports = {
 	DRY_RUN,
 	GITHUB_TOKEN,
 	RAW_REPOSITORIES,
+	PULL_REQUEST,
 	RAW_WORKFLOW_FILES,
 	WORKFLOW_FILES_DIR,
 	REPOSITORIES,
