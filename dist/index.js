@@ -4824,8 +4824,9 @@ module.exports = { identity, add, stats, hasChange, commit, push, currentBranch,
 /***/ 5186:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const nodeexec = __webpack_require__( 8476 );
-const log      = __webpack_require__( 5039 );
+//const nodeexec = require( '../node-exec' );
+const log  = __webpack_require__( 5039 );
+const exec = __webpack_require__( 1514 );
 
 module.exports = async( work_dir, repository_url, args = false, show_log = true ) => {
 	let status = { success: true, data: '' };
@@ -4835,7 +4836,7 @@ module.exports = async( work_dir, repository_url, args = false, show_log = true 
 		cmd += ` ${args} `;
 	}
 
-	await nodeexec( `${cmd}`, work_dir ).then( ( response ) => {
+	await exec( `${cmd}`, [], { cwd: work_dir } ).then( ( response ) => {
 		status.success = true;
 		status.data    = response;
 	} ).catch( ( error ) => {
