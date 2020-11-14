@@ -3535,7 +3535,7 @@ async function run() {
 							await helper.commitfile( local_path );
 						}
 					}
-					//await toolkit.git.push( local_path, git_url );
+					await toolkit.git.push( local_path, git_url );
 				}
 
 			}
