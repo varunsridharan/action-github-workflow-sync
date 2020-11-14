@@ -3386,7 +3386,7 @@ const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSI
 };
 
 const commitfile = async( local_path ) => {
-	let message = `💬 - Files Synced | Github Action Runner : ${toolkit.input.env( 'GITHUB_RUN_NUMBER' )} | ⚡ Triggered By ${toolkit.input.env( 'GITHUB_REPOSITORY' )}@${toolkit.input.env( 'GITHUB_SHA' )}`;
+	let message = `💬 - Files Synced | Runner ID : ${toolkit.input.env( 'GITHUB_RUN_NUMBER' )} | ⚡ Triggered By ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`;
 	return await toolkit.git.commit( local_path, message );
 };
 
@@ -3468,7 +3468,7 @@ async function run() {
 					let file_data = await helper.source_file_location( WORKFLOW_FILES_DIR, owner, repository, workflow_file.src );
 
 					if( false === file_data ) {
-						toolkit.log.error( 'Unable To Find Source File !', '	' );
+						toolkit.log.error( 'Unable To Find Source File !' );
 						toolkit.log( '' );
 						return;
 					}
@@ -3478,7 +3478,7 @@ async function run() {
 					workflow_file.dest = ( 'workflow' === dest_type ) ? `.github/workflows/${workflow_file.dest}` : workflow_file.dest;
 
 					if( workflow_file.type === 'once' && await toolkit.path.exists( `${local_path}${workflow_file.dest}` ) ) {
-						toolkit.log.green( '	File/Folder Already Exists' );
+						toolkit.log.blue( '	File/Folder Already Exists' );
 						toolkit.log( '' );
 						return;
 					}
@@ -3525,7 +3525,7 @@ async function run() {
 					toolkit.log( ' ' );
 				} else {
 					let log_msg = ( false === COMMIT_EACH_FILE ) ? 'Git Commit & Push Log' : 'Git Push Log';
-					toolkit.log( log_msg );
+					toolkit.log.green( log_msg );
 
 					if( !COMMIT_EACH_FILE ) {
 						let haschange = await toolkit.git.hasChange( local_path, true );
