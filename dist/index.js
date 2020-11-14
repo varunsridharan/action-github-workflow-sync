@@ -8993,15 +8993,16 @@ async function run() {
 				} else {
 					let haschange = await toolkit.git.hasChange( local_path, true );
 					let log_msg   = ( false === COMMIT_EACH_FILE ) ? 'Git Commit & Push Log' : 'Git Push Log';
+					if( '' === haschange && !COMMIT_EACH_FILE ) {
+						toolkit.log.success( 'No Changes Are Done :', '	' );
+					} else if( false !== haschange && !COMMIT_EACH_FILE ) {
+						await helper.commitfile( local_path );
+						modified.push( local_path );
+					}
+
 					if( modified.length > 0 ) {
 						toolkit.log.green( log_msg );
 						toolkit.log( '---------------------------------------------------' );
-						if( '' === haschange && !COMMIT_EACH_FILE ) {
-							toolkit.log.success( 'No Changes Are Done :', '	' );
-						} else if( false !== haschange && !COMMIT_EACH_FILE ) {
-							await helper.commitfile( local_path );
-						}
-
 						let pushh_status = await toolkit.git.push( local_path, git_url, false, true );
 						toolkit.log( JSON.stringify( pushh_status ) );
 
@@ -9016,7 +9017,6 @@ async function run() {
 							} );
 							toolkit.log( JSON.stringify( response ) );
 						}
-
 						toolkit.log( '---------------------------------------------------' );
 					}
 				}
