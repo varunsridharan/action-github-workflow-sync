@@ -4956,15 +4956,15 @@ module.exports = ( command, workingDir ) => new Promise( ( resolve, reject ) => 
 /***/ 7787:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const path = __webpack_require__( 5622 );
-const fs   = __webpack_require__( 5747 );
-
+const path              = __webpack_require__( 5622 );
+const fs                = __webpack_require__( 5747 );
+const rtrim             = __webpack_require__( 9608 );
 /**
  * Searches For Chars "./", "/../"," ", "../" and fixes for absolute path
  * @param $path
  * @return {string}
  */
-const fix = ( $path ) => {
+const fix               = ( $path ) => {
 	$path       = $path.trim();
 	const regex = /^(\s|\/..\/|(?:\/|).\/|\/)(.+)/;
 	let m       = regex.exec( $path );
@@ -4978,9 +4978,13 @@ const fix = ( $path ) => {
 	}
 	return $path;
 };
+const untrailingslashit = ( $string ) => rtrim( $string, '/\\' );
+const trailingslashit   = ( $string ) => untrailingslashit( $string ) + '/\\';
 
 module.exports = {
 	fix,
+	trailingslashit: trailingslashit,
+	untrailingslashit: untrailingslashit,
 	basename: path.basename,
 	dirname: path.dirname,
 	isDir: async( $path ) => await fs.lstatSync( $path ).isDirectory(),
@@ -6608,6 +6612,33 @@ function isPlainObject(o) {
 
 exports.isPlainObject = isPlainObject;
 
+
+/***/ }),
+
+/***/ 9608:
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = function rtrim(str, charlist) {
+  //  discuss at: https://locutus.io/php/rtrim/
+  // original by: Kevin van Zonneveld (https://kvz.io)
+  //    input by: Erkekjetter
+  //    input by: rem
+  // improved by: Kevin van Zonneveld (https://kvz.io)
+  // bugfixed by: Onno Marsman (https://twitter.com/onnomarsman)
+  // bugfixed by: Brett Zamir (https://brett-zamir.me)
+  //   example 1: rtrim('    Kevin van Zonneveld    ')
+  //   returns 1: '    Kevin van Zonneveld'
+
+  charlist = !charlist ? ' \\s\xA0' : (charlist + '').replace(/([[\]().?/*{}+$^:])/g, '\\$1');
+
+  var re = new RegExp('[' + charlist + ']+$', 'g');
+
+  return (str + '').replace(re, '');
+};
+//# sourceMappingURL=rtrim.js.map
 
 /***/ }),
 
