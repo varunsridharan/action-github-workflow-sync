@@ -4824,15 +4824,13 @@ module.exports = { identity, add, stats, hasChange, commit, push, currentBranch,
 /***/ 5186:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-//const nodeexec = require( '../node-exec' );
-const log  = __webpack_require__( 5039 );
-const exec = __webpack_require__( 1514 );
+const exec     = __webpack_require__( 1514 );
 
-module.exports = async( work_dir, repository_url, args = false, show_log = true ) => {
+module.exports = async( work_dir, repository_url, args = false ) => {
 	let status = { success: true, data: '' };
-	let cmd    = `git push "${repository_url}"`;
+	let cmd    = `git push "${repository_url}" `;
 
-	if( args ) {
+	if( false !== args ) {
 		cmd += ` ${args} `;
 	}
 
@@ -8931,19 +8929,16 @@ async function run() {
 
 					let cp_options    = ( is_dir ) ? { recursive: true, force: true } : {},
 						iscopied      = true,
-						dest_basepath = toolkit.path.dirname( `${local_path}${workflow_file.dest}` );
-
+						dest_basepath = toolkit.path.dirname( `${local_path}${workflow_file.dest}` ),
+						copy_source   = ( is_dir ) ? `${toolkit.path.trailingslashit( source_path )}.` : source_path;
 
 					toolkit.log.success( `${relative_path} => ${workflow_file.dest}`, '	' );
+					toolkit.log( `${copy_source} => ${local_path}${workflow_file.dest}` );
 
 					if( !toolkit.path.exists( dest_basepath ) ) {
 						toolkit.log( `Creating ${dest_basepath}`, '	' );
 						await io.mkdirP( dest_basepath );
 					}
-
-					let copy_source = ( await toolkit.path.isDir( source_path ) ) ? `${source_path}/.` : source_path;
-
-					toolkit.log( `${copy_source} => ${local_path}${workflow_file.dest}` );
 
 					await io.cp( copy_source, `${local_path}${workflow_file.dest}`, cp_options ).catch( error => {
 						toolkit.log.error( 'Unable To Copy File.', '	' );
