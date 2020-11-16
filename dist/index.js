@@ -8988,7 +8988,6 @@ async function run() {
 						copy_source   = ( is_dir ) ? `${toolkit.path.trailingslashit( source_path )}.` : source_path;
 
 					toolkit.log.success( `${relative_path} => ${workflow_file.dest}`, '	' );
-					toolkit.log( `${copy_source} => ${local_path}${workflow_file.dest}` );
 
 					if( !toolkit.path.exists( dest_basepath ) ) {
 						toolkit.log( `Creating ${dest_basepath}`, '	' );
