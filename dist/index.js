@@ -8690,10 +8690,6 @@ const repositoryDetails = ( input_repo ) => {
 	};
 };
 
-const createBranch = async() => {
-
-};
-
 const repositoryClone = async( git_url, local_path, branch, auto_create_branch ) => {
 	const common_arg = '--quiet --no-hardlinks --no-tags';
 	const options    = { silent: true };
@@ -8829,29 +8825,7 @@ const createPullRequestBranch = async( work_dir, current_branch ) => {
 	return ( true === status ) ? new_branch_name : false;
 };
 
-const gitPush = async( work_dir, repository_url, args = false, show_log = true ) => {
-	let status = true;
-	let cmd    = `git push "${repository_url}" `;
-
-	if( false !== args ) {
-		cmd += ` ${args} `;
-	}
-
-	await exec.exec( `${cmd}`, [], { cwd: work_dir } ).then( ( response ) => {
-		if( show_log ) {
-			toolkit.log.success( `${response}` );
-		}
-	} ).catch( ( error ) => {
-		if( show_log ) {
-			toolkit.log.error( `${error}` );
-		}
-		status = false;
-	} );
-	return status;
-};
-
 module.exports = {
-	gitPush: gitPush,
 	createPullRequestBranch: createPullRequestBranch,
 	commitfile: commitfile,
 	repositoryDetails: repositoryDetails,
@@ -9059,7 +9033,7 @@ const GITHUB_WORKSPACE       = toolkit.input.env( 'GITHUB_WORKSPACE' );
 const WORKSPACE              = toolkit.path.dirname( toolkit.path.dirname( GITHUB_WORKSPACE ) ) + '/workflow-sync/';
 
 module.exports = {
-	GIT_USER: 'Github Actions Workflow Sync Bot',
+	GIT_USER: 'Workflow Sync Bot',
 	GIT_EMAIL: 'githubactionbot+workflowsync@gmail.com',
 	AUTO_CREATE_NEW_BRANCH,
 	COMMIT_EACH_FILE,
