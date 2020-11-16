@@ -90,8 +90,8 @@ async function run() {
 
 					let cp_options    = ( is_dir ) ? { recursive: true, force: true } : {},
 						iscopied      = true,
-						dest_basepath = toolkit.path.dirname( `${local_path}${workflow_file.dest}` );
-
+						dest_basepath = toolkit.path.dirname( `${local_path}${workflow_file.dest}` ),
+						copy_source   = ( is_dir ) ? `${toolkit.path.trailingslashit( source_path )}.` : source_path;
 
 					toolkit.log.success( `${relative_path} => ${workflow_file.dest}`, '	' );
 
@@ -99,8 +99,6 @@ async function run() {
 						toolkit.log( `Creating ${dest_basepath}`, '	' );
 						await io.mkdirP( dest_basepath );
 					}
-
-					let copy_source = ( await toolkit.path.isDir( source_path ) ) ? `${source_path}.` : source_path;
 
 					await io.cp( copy_source, `${local_path}${workflow_file.dest}`, cp_options ).catch( error => {
 						toolkit.log.error( 'Unable To Copy File.', '	' );

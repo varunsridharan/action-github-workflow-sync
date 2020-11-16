@@ -23,7 +23,7 @@
  },
  "homepage": "https://github.com/actions/javascript-action#readme",
  "dependencies": {
-  "actions-js-toolkit": "^0.0.10",
+  "actions-js-toolkit": "^0.0.13",
   "@actions/github": "^4.0.0"
  },
  "devDependencies": {
