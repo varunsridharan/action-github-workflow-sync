@@ -4978,8 +4978,8 @@ const fix               = ( $path ) => {
 	}
 	return $path;
 };
-const untrailingslashit = ( $string ) => rtrim( $string, '/\\' );
-const trailingslashit   = ( $string ) => untrailingslashit( $string ) + '/\\';
+const untrailingslashit = ( $string ) => rtrim( $string, '/' );
+const trailingslashit   = ( $string ) => untrailingslashit( $string ) + '/';
 
 module.exports = {
 	fix: fix,
