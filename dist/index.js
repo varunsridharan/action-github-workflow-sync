@@ -4958,7 +4958,7 @@ module.exports = ( command, workingDir ) => new Promise( ( resolve, reject ) => 
 
 const path              = __webpack_require__( 5622 );
 const fs                = __webpack_require__( 5747 );
-const rtrim             = __webpack_require__( 9608 );
+const rtrim             = __webpack_require__( 2093 );
 /**
  * Searches For Chars "./", "/../"," ", "../" and fixes for absolute path
  * @param $path
@@ -4982,7 +4982,7 @@ const untrailingslashit = ( $string ) => rtrim( $string, '/\\' );
 const trailingslashit   = ( $string ) => untrailingslashit( $string ) + '/\\';
 
 module.exports = {
-	fix,
+	fix: fix,
 	trailingslashit: trailingslashit,
 	untrailingslashit: untrailingslashit,
 	basename: path.basename,
@@ -6612,33 +6612,6 @@ function isPlainObject(o) {
 
 exports.isPlainObject = isPlainObject;
 
-
-/***/ }),
-
-/***/ 9608:
-/***/ ((module) => {
-
-"use strict";
-
-
-module.exports = function rtrim(str, charlist) {
-  //  discuss at: https://locutus.io/php/rtrim/
-  // original by: Kevin van Zonneveld (https://kvz.io)
-  //    input by: Erkekjetter
-  //    input by: rem
-  // improved by: Kevin van Zonneveld (https://kvz.io)
-  // bugfixed by: Onno Marsman (https://twitter.com/onnomarsman)
-  // bugfixed by: Brett Zamir (https://brett-zamir.me)
-  //   example 1: rtrim('    Kevin van Zonneveld    ')
-  //   returns 1: '    Kevin van Zonneveld'
-
-  charlist = !charlist ? ' \\s\xA0' : (charlist + '').replace(/([[\]().?/*{}+$^:])/g, '\\$1');
-
-  var re = new RegExp('[' + charlist + ']+$', 'g');
-
-  return (str + '').replace(re, '');
-};
-//# sourceMappingURL=rtrim.js.map
 
 /***/ }),
 
@@ -8344,6 +8317,57 @@ function onceStrict (fn) {
   f.called = false
   return f
 }
+
+
+/***/ }),
+
+/***/ 2093:
+/***/ ((module) => {
+
+"use strict";
+
+
+
+/**
+ * Strip whitespace - or other characters - from the end of a string
+ *
+ * @param  {String} str   Input string
+ * @param  {String} chars Character(s) to strip [optional]
+ * @return {String} str   Modified string
+ */
+
+module.exports = function ( str, chars ) {
+
+    // Convert to string
+    str = str.toString();
+
+    // Empty string?
+    if ( ! str ) {
+        return '';
+    }
+
+    // Remove whitespace if chars arg is empty
+    if ( ! chars ) {
+        return str.replace( /\s+$/, '' );
+    }
+
+    // Convert to string
+    chars = chars.toString();
+
+    // Set vars
+    var letters = str.split( '' ),
+        i = letters.length - 1;
+
+    // Loop letters
+    for ( i; i >= 0; i -- ) {
+        if ( chars.indexOf( letters[i] ) === -1 ) {
+            return str.substring( 0, i + 1 );
+        }
+    }
+
+    return str;
+
+};
 
 
 /***/ }),
