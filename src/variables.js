@@ -15,7 +15,7 @@ const GITHUB_WORKSPACE       = toolkit.input.env( 'GITHUB_WORKSPACE' );
 const WORKSPACE              = toolkit.path.dirname( toolkit.path.dirname( GITHUB_WORKSPACE ) ) + '/workflow-sync/';
 
 module.exports = {
-	GIT_USER: 'Github Actions Workflow Sync Bot',
+	GIT_USER: 'Workflow Sync Bot',
 	GIT_EMAIL: 'githubactionbot+workflowsync@gmail.com',
 	AUTO_CREATE_NEW_BRANCH,
 	COMMIT_EACH_FILE,
