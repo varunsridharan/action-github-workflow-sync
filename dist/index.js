@@ -8941,12 +8941,13 @@ async function run() {
 						await io.mkdirP( dest_basepath );
 					}
 
-					let copy_source = ( await toolkit.path.isDir( source_path ) ) ? `${source_path}.` : source_path;
+					let copy_source = ( await toolkit.path.isDir( source_path ) ) ? `${source_path}/.` : source_path;
+
+					toolkit.log( `${copy_source} => ${local_path}${workflow_file.dest}` );
 
 					await io.cp( copy_source, `${local_path}${workflow_file.dest}`, cp_options ).catch( error => {
 						toolkit.log.error( 'Unable To Copy File.', '	' );
 						toolkit.log( error );
-						toolkit.log( `${copy_source} => ${local_path}${workflow_file.dest}` );
 						iscopied = false;
 					} ).then( async() => {
 						await toolkit.git.add( local_path, `${workflow_file.dest}`, true );
