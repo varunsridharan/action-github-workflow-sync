@@ -9,7 +9,7 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 ## 3.0 - 16/11/2020
 * Fully Redeveloped From Base but using NodeJS
 * Improved performance by 80%
-* Option to copy file to remote repository if file alreayd not exists. `!=`
+* Option to copy file to remote repository if file already  not exists. `!=`
 * Option to auto create a new pull request.
 
 ---
