@@ -10,7 +10,7 @@ _This Github Action can come in handy when you have lot of projects like i do._
 _where in some case certain projects users action workflow which are common across projects._
 _Example : [Project 1][project1] & [Project 2][project2] it can be pain to keep all the workflow updated with Github Action's Module's version._
 
-This also isn't limited to Github Action yaml files - another use case could be keeping the `.editorconfig`, `LICENSE`, `tsconfig.json`, `tslint.json`, `.gitignore`, `azure-pieplines.yml`, etc. in sync across all your repositories.
+This also isn't limited to Github Action yaml files - another use case could be keeping the `.editorconfig`, `LICENSE`, `tsconfig.json`, `tslint.json`, `.gitignore`, etc. in sync across all your repositories.
 
 >_Here where this action comes in and reduces your stress 😉 it can update all your repository actions file based on the config provided_ 
 
@@ -25,6 +25,7 @@ This also isn't limited to Github Action yaml files - another use case could be 
 | `WORKFLOW_FILES_DIR` | ***workflows*** | Local Path Where Common Workflow Files Are Located ***Eg : `workflows`*** |
 | `AUTO_CREATE_NEW_BRANCH` | ***false*** | Auto create new brach in a repository if the branch dose not exists |
 | `COMMIT_EACH_FILE` | ***false*** | if you need to keep track of each file's commit history separate then set it to true |
+| `PULL_REQUEST` | **false** | Set to `true` if you want the changes to be pushed via pull request. |
 
 ### Personal Access Token Scope
 #### [Github Personal Token](https://github.com/settings/tokens/new?description=gh-workflow-sync)  <small> Is required with the below scope </small>
@@ -62,6 +63,9 @@ REPOSITORIES: |
 ---
 
 ### `WORKFLOW_FILES` Configuration Examples
+
+1. If you use `=` as a file seperator `file1.md=myfile.md` then `file1` from the current repository will be copied to remote repository with the name of `myfile.md`
+1. If you use `!=` as a file seperator `file1.md!=myfile.md` then `file1` from the current repository will be copied to remote repository with the name of `myfile.md` only if `myfile.md` already not exists in the remote repository
 
 <details><summary><strong>Files - Source & Destination File Without Custom Name</strong></summary>
 

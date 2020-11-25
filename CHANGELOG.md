@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
 ---
+
+## 3.0 - 16/11/2020
+* Fully Redeveloped From Base but using NodeJS
+* Improved performance by 80%
+* Option to copy file to remote repository if file alreayd not exists. `!=`
+* Option to auto create a new pull request.
+
+---
+
 ## 2.0 - 24/10/2020
 * Fully Redeveloped From Base
 * Migrated Docker File To `varunsridharan/actions-alpine:latest`

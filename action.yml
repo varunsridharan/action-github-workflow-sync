@@ -32,15 +32,11 @@ inputs:
     description: "If set to true then all files are commited 1 by 1 instead of commiting everything @ once"
     required: false
     default: 'false'
+  PULL_REQUEST:
+    description: "Whether or not you want to do a pull request. Only works when branch name is provided. Default false"
+    required: false
+    default: 'false'
 
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
-  args:
-    - ${{ inputs.REPOSITORIES }}
-    - ${{ inputs.WORKFLOW_FILES }}
-    - ${{ inputs.GITHUB_TOKEN }}
-    - ${{ inputs.DRY_RUN }}
-    - ${{ inputs.WORKFLOW_FILES_DIR }}
-    - ${{ inputs.COMMIT_EACH_FILE }}
-    - ${{ inputs.AUTO_CREATE_NEW_BRANCH }}
+  using: 'node12'
+  main: 'dist/index.js'
