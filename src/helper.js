@@ -143,7 +143,7 @@ const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSI
 const commitfile = async( local_path, skip_ci, commit_message ) => {
 	let message = `💬 - Files Synced | Runner ID : ${toolkit.input.env( 'GITHUB_RUN_NUMBER' )} | ⚡ Triggered By ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`;
 
-	if( typeof commit_message === 'undefined' && skip_ci ) {
+	if( ( typeof commit_message === 'undefined' || commit_message === 'false' || commit_message === false ) && skip_ci ) {
 		message = '[skip ci] | ' + message;
 	}
 
