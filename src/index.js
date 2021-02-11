@@ -15,6 +15,8 @@ async function run() {
 	let REPOSITORIES           = require( './variables' ).REPOSITORIES;
 	let WORKFLOW_FILES         = require( './variables' ).WORKFLOW_FILES;
 	let PULL_REQUEST           = require( './variables' ).PULL_REQUEST;
+	let SKIP_CI                = require( './variables' ).SKIP_CI;
+	let COMMIT_MESSAGE         = require( './variables' ).COMMIT_MESSAGE;
 
 	toolkit.log( '-------------------------------------------------------' );
 	toolkit.log( '⚙️ Basic Config' );
@@ -24,6 +26,8 @@ async function run() {
 	toolkit.log( `  * DRY_RUN                    : ${DRY_RUN}` );
 	toolkit.log( `  * WORKFLOW_FILES_DIR         : ${WORKFLOW_FILES_DIR}` );
 	toolkit.log( `  * WORKSPACE                  : ${WORKSPACE}` );
+	toolkit.log( `  * SKIP_CI                    : ${SKIP_CI}` );
+	toolkit.log( `  * COMMIT_MESSAGE             : ${COMMIT_MESSAGE}` );
 	toolkit.log( '-------------------------------------------------------' );
 	toolkit.log( '' );
 
@@ -112,7 +116,7 @@ async function run() {
 							if( '' === haschange ) {
 								toolkit.log.green( '	No changes detected' );
 							} else if( false !== haschange ) {
-								await helper.commitfile( local_path );
+								await helper.commitfile( local_path, SKIP_CI, COMMIT_MESSAGE );
 								modified.push( `${workflow_file.dest}` );
 							}
 						}
@@ -133,7 +137,7 @@ async function run() {
 					if( '' === haschange && !COMMIT_EACH_FILE ) {
 						toolkit.log.success( 'No Changes Are Done :', '	' );
 					} else if( false !== haschange && !COMMIT_EACH_FILE ) {
-						await helper.commitfile( local_path );
+						await helper.commitfile( local_path, SKIP_CI, COMMIT_MESSAGE );
 						modified.push( local_path );
 					}
 

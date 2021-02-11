@@ -36,6 +36,14 @@ inputs:
     description: "Whether or not you want to do a pull request. Only works when branch name is provided. Default false"
     required: false
     default: 'false'
+  SKIP_CI:
+    description: "Adds [skip ci] to commit message which will avoid running github actions in targer repository"
+    required: false
+    default: 'false'
+  COMMIT_MESSAGE:
+    description: "Provide your own custom commit MESSAGE"
+    required: false
+    default: 'false'
 
 runs:
   using: 'node12'

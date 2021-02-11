@@ -5,8 +5,10 @@ const AUTO_CREATE_NEW_BRANCH = toolkit.input.tobool( core.getInput( 'AUTO_CREATE
 const COMMIT_EACH_FILE       = toolkit.input.tobool( core.getInput( 'COMMIT_EACH_FILE' ) );
 const DRY_RUN                = toolkit.input.tobool( core.getInput( 'DRY_RUN' ) );
 const PULL_REQUEST           = toolkit.input.tobool( core.getInput( 'PULL_REQUEST' ) );
+const SKIP_CI                = toolkit.input.tobool( core.getInput( 'SKIP_CI' ) );
 const GITHUB_TOKEN           = core.getInput( 'GITHUB_TOKEN' );
 const RAW_REPOSITORIES       = core.getInput( 'REPOSITORIES' );
+const COMMIT_MESSAGE         = core.getInput( 'COMMIT_MESSAGE' );
 const RAW_WORKFLOW_FILES     = core.getInput( 'WORKFLOW_FILES' );
 const WORKFLOW_FILES_DIR     = core.getInput( 'WORKFLOW_FILES_DIR' );
 const REPOSITORIES           = RAW_REPOSITORIES.split( '\n' );
@@ -29,4 +31,6 @@ module.exports = {
 	WORKFLOW_FILES,
 	WORKSPACE,
 	GITHUB_WORKSPACE,
+	SKIP_CI,
+	COMMIT_MESSAGE
 };

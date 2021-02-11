@@ -4781,20 +4781,22 @@ const nodeexec = __webpack_require__( 8476 );
 const gh_core  = __webpack_require__( 2186 );
 const log      = __webpack_require__( 5039 );
 
-module.exports = async( GIT_PATH, GIT_USER, GIT_EMAIL, LOG = true ) => {
+module.exports = async( work_dir, user, email, show_log = true ) => {
 	let status = true;
-	let cmd    = `git config --local user.name "${GIT_USER}" && git config --local user.email "${GIT_EMAIL}"`;
-	await nodeexec( cmd, GIT_PATH ).then( () => {
-		if( LOG ) {
+	let cmd    = `git config --local user.name "${user}" && git config --local user.email "${email}"`;
+	await nodeexec( cmd, work_dir ).then( () => {
+		if( show_log ) {
 			log( '' );
 			log( '🗃 Git Config' );
-			log( `	> Name  : ${GIT_USER}` );
-			log( `	> Email : ${GIT_EMAIL}` );
+			log( `	> Name  : ${user}` );
+			log( `	> Email : ${email}` );
 			log( '' );
 		}
 	} ).catch( ( error ) => {
-		log.error( 'Unable To Set GIT Identity' );
-		gh_core.error( error );
+		if( show_log ) {
+			log.error( 'Unable To Set GIT Identity' );
+			gh_core.error( error );
+		}
 		status = false;
 	} );
 	return status;
@@ -4815,7 +4817,16 @@ const push           = __webpack_require__( 5186 );
 const currentBranch  = __webpack_require__( 3511 );
 const getAllBranches = __webpack_require__( 3009 );
 
-module.exports = { identity, add, stats, hasChange, commit, push, currentBranch, getAllBranches };
+module.exports = {
+	identity: identity,
+	add: add,
+	stats: stats,
+	hasChange: hasChange,
+	commit: commit,
+	push: push,
+	currentBranch: currentBranch,
+	getAllBranche: getAllBranches
+};
 
 
 
@@ -4888,7 +4899,7 @@ module.exports = { log, exec, git, path, asyncForEach, input };
 
 const gh_core      = __webpack_require__( 2186 );
 const gh_env       = ( key, _default ) => ( typeof process.env[ key ] !== 'undefined' ) ? process.env[ key ] : _default;
-const evn_validate = ( key, message = false ) => {
+const env_validate = ( key, message = false ) => {
 	if( undefined === gh_env( key ) ) {
 		message = ( '' === message || false === message ) ? `🚩  ${key} Not Found. Please Set It As ENV Variable` : message;
 		gh_core.setFailed( message );
@@ -4897,7 +4908,7 @@ const evn_validate = ( key, message = false ) => {
 module.exports     = {
 	tobool: ( value ) => ( value === 'true' ),
 	env: gh_env,
-	evn_validate,
+	env_validate: env_validate,
 };
 
 
@@ -4907,8 +4918,8 @@ module.exports     = {
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const gh_core = __webpack_require__( 2186 );
-const log     = ( log ) => gh_core.info( `${log}` );
 const style   = __webpack_require__( 2068 );
+const log     = ( log ) => gh_core.info( `${log}` );
 
 log.success = ( log, before = '' ) => gh_core.info( `${before}✔  ${log}` );
 log.warning = ( log, before = '' ) => gh_core.warning( `${before}⚠️ ${log}` );
@@ -4978,8 +4989,8 @@ const fix               = ( $path ) => {
 	}
 	return $path;
 };
-const untrailingslashit = ( $string ) => rtrim( $string, '/' );
-const trailingslashit   = ( $string ) => untrailingslashit( $string ) + '/';
+const untrailingslashit = ( $string ) => rtrim( $string, '/\\' );
+const trailingslashit   = ( $string ) => untrailingslashit( $string ) + '/\\';
 
 module.exports = {
 	fix: fix,
@@ -8863,8 +8874,17 @@ const source_file_location = async( WORKFLOW_FILES_DIR, REPOSITORY_OWNER, REPOSI
 	return _return;
 };
 
-const commitfile = async( local_path ) => {
+const commitfile = async( local_path, skip_ci, commit_message ) => {
 	let message = `💬 - Files Synced | Runner ID : ${toolkit.input.env( 'GITHUB_RUN_NUMBER' )} | ⚡ Triggered By ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`;
+
+	if( typeof commit_message === 'undefined' && true === skip_ci ) {
+		message = message + ' | [skip ci] ';
+	}
+
+	if( typeof commit_message === 'string' && ( commit_message !== 'false' && commit_message !== 'true' ) ) {
+		message = commit_message;
+	}
+
 	return await toolkit.git.commit( local_path, message );
 };
 
@@ -8909,6 +8929,8 @@ async function run() {
 	let REPOSITORIES           = __webpack_require__(3424).REPOSITORIES;
 	let WORKFLOW_FILES         = __webpack_require__(3424).WORKFLOW_FILES;
 	let PULL_REQUEST           = __webpack_require__(3424).PULL_REQUEST;
+	let SKIP_CI                = __webpack_require__(3424).SKIP_CI;
+	let COMMIT_MESSAGE         = __webpack_require__(3424).COMMIT_MESSAGE;
 
 	toolkit.log( '-------------------------------------------------------' );
 	toolkit.log( '⚙️ Basic Config' );
@@ -8918,6 +8940,8 @@ async function run() {
 	toolkit.log( `  * DRY_RUN                    : ${DRY_RUN}` );
 	toolkit.log( `  * WORKFLOW_FILES_DIR         : ${WORKFLOW_FILES_DIR}` );
 	toolkit.log( `  * WORKSPACE                  : ${WORKSPACE}` );
+	toolkit.log( `  * SKIP_CI                    : ${SKIP_CI}` );
+	toolkit.log( `  * COMMIT_MESSAGE             : ${COMMIT_MESSAGE}` );
 	toolkit.log( '-------------------------------------------------------' );
 	toolkit.log( '' );
 
@@ -9006,7 +9030,7 @@ async function run() {
 							if( '' === haschange ) {
 								toolkit.log.green( '	No changes detected' );
 							} else if( false !== haschange ) {
-								await helper.commitfile( local_path );
+								await helper.commitfile( local_path, SKIP_CI, COMMIT_MESSAGE );
 								modified.push( `${workflow_file.dest}` );
 							}
 						}
@@ -9027,7 +9051,7 @@ async function run() {
 					if( '' === haschange && !COMMIT_EACH_FILE ) {
 						toolkit.log.success( 'No Changes Are Done :', '	' );
 					} else if( false !== haschange && !COMMIT_EACH_FILE ) {
-						await helper.commitfile( local_path );
+						await helper.commitfile( local_path, SKIP_CI, COMMIT_MESSAGE );
 						modified.push( local_path );
 					}
 
@@ -9074,8 +9098,10 @@ const AUTO_CREATE_NEW_BRANCH = toolkit.input.tobool( core.getInput( 'AUTO_CREATE
 const COMMIT_EACH_FILE       = toolkit.input.tobool( core.getInput( 'COMMIT_EACH_FILE' ) );
 const DRY_RUN                = toolkit.input.tobool( core.getInput( 'DRY_RUN' ) );
 const PULL_REQUEST           = toolkit.input.tobool( core.getInput( 'PULL_REQUEST' ) );
+const SKIP_CI                = toolkit.input.tobool( core.getInput( 'SKIP_CI' ) );
 const GITHUB_TOKEN           = core.getInput( 'GITHUB_TOKEN' );
 const RAW_REPOSITORIES       = core.getInput( 'REPOSITORIES' );
+const COMMIT_MESSAGE         = core.getInput( 'COMMIT_MESSAGE' );
 const RAW_WORKFLOW_FILES     = core.getInput( 'WORKFLOW_FILES' );
 const WORKFLOW_FILES_DIR     = core.getInput( 'WORKFLOW_FILES_DIR' );
 const REPOSITORIES           = RAW_REPOSITORIES.split( '\n' );
@@ -9098,6 +9124,8 @@ module.exports = {
 	WORKFLOW_FILES,
 	WORKSPACE,
 	GITHUB_WORKSPACE,
+	SKIP_CI,
+	COMMIT_MESSAGE
 };
 
 /***/ }),
