@@ -6,6 +6,12 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ---
 
+## 3.1 - 11/02/2021
+* Added Option `SKIP_CI` [#6](https://github.com/varunsridharan/action-github-workflow-sync/issues/6)
+* Added Option `COMMIT_MESSAGE` to provide custom message by end user [#6](https://github.com/varunsridharan/action-github-workflow-sync/issues/6)
+
+---
+
 ## 3.0 - 16/11/2020
 * Fully Redeveloped From Base but using NodeJS
 * Improved performance by 80%
