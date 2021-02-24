@@ -237,7 +237,7 @@ If you, or your company, use any of my projects or like what I’m doing, kindly
 - 🚀         Love open-source tools? Me too! How about supporting one hour of open-source development for just [**$49.99 one-time ?**][paypal]
 
 ## 📝 License & Conduct
-- [**General Public License v3.0 license**](LICENSE) © [Varun Sridharan](website)
+- [**MIT license**](LICENSE) © [Varun Sridharan](website)
 - [Code of Conduct](code-of-conduct.md)
 
 ## 📣 Feedback
