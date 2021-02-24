@@ -238,7 +238,7 @@ If you, or your company, use any of my projects or like what I’m doing, kindly
 
 ## 📝 License & Conduct
 - [**MIT license**](LICENSE) © [Varun Sridharan](website)
-- [Code of Conduct](code-of-conduct.md)
+
 
 ## 📣 Feedback
 - ⭐ This repository if this project helped you! :wink:
