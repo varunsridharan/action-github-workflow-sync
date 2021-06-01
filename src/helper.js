@@ -22,14 +22,14 @@ const repositoryDetails = ( input_repo ) => {
 
 const repositoryClone = async( git_url, local_path, branch, auto_create_branch ) => {
 	const common_arg = '--quiet --no-hardlinks --no-tags';
-	const options    = { silent: true };
-	let stauts       = true;
+	const options    = { silent: false };
+	let status       = true;
 	if( 'default' === branch ) {
 		await exec.exec( `git clone ${common_arg} --depth 1 ${git_url} "${local_path}"`, [], options )
 				  .then( () => toolkit.log.success( 'Repository Cloned', '	' ) )
 				  .catch( () => {
-					  toolkit.log.error( 'Repository Dose Not Exists !', '	' );
-					  stauts = false;
+					  toolkit.log.error( 'Unable to Clone Repository!', '	' );
+					  status = false;
 				  } );
 	} else {
 		await exec.exec( `git clone ${common_arg} --depth 1 --branch "${branch}" ${git_url} "${local_path}"`, [], options )
@@ -43,24 +43,24 @@ const repositoryClone = async( git_url, local_path, branch, auto_create_branch )
 													 .then( () => {
 														 toolkit.log.success( 'Repository Cloned', '	' );
 														 toolkit.log.success( 'Branch Created', '	' );
-														 stauts = 'created';
+														 status = 'created';
 													 } )
 													 .catch( () => {
 														 toolkit.log.error( 'Unable To Create Branch.', '	' );
-														 stauts = false;
+														 status = false;
 													 } );
 									} )
 									.catch( () => {
 										toolkit.log.error( 'Repository Dose Not Exists !', '	' );
-										stauts = false;
+										status = false;
 									} );
 					  } else {
 						  toolkit.log.error( `Repository Branch ${branch} Not Found!`, '	' );
-						  stauts = false;
+						  status = false;
 					  }
 				  } );
 	}
-	return stauts;
+	return status;
 };
 
 const extract_workflow_file_info = ( file ) => {
