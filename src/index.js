@@ -95,7 +95,7 @@ async function run() {
 					let cp_options    = ( is_dir ) ? { recursive: true, force: true } : {},
 						iscopied      = true,
 						dest_basepath = toolkit.path.dirname( `${local_path}${workflow_file.dest}` ),
-						copy_source   = ( is_dir ) ? `${toolkit.path.trailingslashit( source_path )}.` : source_path;
+						copy_source   = source_path;
 
 					toolkit.log.success( `${relative_path} => ${workflow_file.dest}`, '	' );
 
