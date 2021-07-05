@@ -154,6 +154,12 @@ async function run() {
 								head: pull_request_branch,
 								base: current_branch,
 							} );
+							await octokit.issues.addAssignees( {
+								owner: owner,
+								repo: repository,
+								issue_number: pullrequest.number,
+								assignees: require( './variables' ).ASSIGNEES
+							} );
 							await octokit.pulls.requestReviewers( {
 								owner: owner,
 								repo: repository,
