@@ -9068,6 +9068,13 @@ async function run() {
 								head: pull_request_branch,
 								base: current_branch,
 							} );
+							await octokit.rest.pulls.requestReviewers( {
+								owner: owner,
+								repo: repository,
+								pull_number: pullrequest.number,
+								reviewers: __webpack_require__(3424).REVIEWERS,
+								team_reviewers: __webpack_require__(3424).TEAM_REVIEWERS,
+							} );
 							toolkit.log.green( `Pull Request Created : #${pullrequest.number}` );
 							toolkit.log( `${pullrequest.html_url}` );
 						}
@@ -9104,8 +9111,12 @@ const RAW_REPOSITORIES       = core.getInput( 'REPOSITORIES' );
 const COMMIT_MESSAGE         = core.getInput( 'COMMIT_MESSAGE' );
 const RAW_WORKFLOW_FILES     = core.getInput( 'WORKFLOW_FILES' );
 const WORKFLOW_FILES_DIR     = core.getInput( 'WORKFLOW_FILES_DIR' );
+const RAW_REVIEWERS          = core.getInput( 'REVIEWERS' );
+const RAW_TEAM_REVIEWERS     = core.getInput( 'TEAM_REVIEWERS' );
 const REPOSITORIES           = RAW_REPOSITORIES.split( '\n' );
 const WORKFLOW_FILES         = RAW_WORKFLOW_FILES.split( '\n' );
+const REVIEWERS              = RAW_REVIEWERS.split( '\n' );
+const TEAM_REVIEWERS         = RAW_TEAM_REVIEWERS.split( '\n' );
 const GITHUB_WORKSPACE       = toolkit.input.env( 'GITHUB_WORKSPACE' );
 const WORKSPACE              = toolkit.path.dirname( toolkit.path.dirname( GITHUB_WORKSPACE ) ) + '/workflow-sync/';
 
@@ -9125,7 +9136,9 @@ module.exports = {
 	WORKSPACE,
 	GITHUB_WORKSPACE,
 	SKIP_CI,
-	COMMIT_MESSAGE
+	COMMIT_MESSAGE,
+	REVIEWERS,
+	TEAM_REVIEWERS,
 };
 
 /***/ }),

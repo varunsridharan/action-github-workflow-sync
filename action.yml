@@ -44,6 +44,14 @@ inputs:
     description: "Provide your own custom commit MESSAGE"
     required: false
     default: 'false'
+  REVIEWERS:
+    description: "Request pull request reviews"
+    required: false
+    default: ''
+  TEAM_REVIEWERS:
+    description: "Request pull request team reviews"
+    required: false
+    default: ''
 
 runs:
   using: 'node12'
