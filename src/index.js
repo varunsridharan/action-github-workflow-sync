@@ -154,6 +154,13 @@ async function run() {
 								head: pull_request_branch,
 								base: current_branch,
 							} );
+							await octokit.rest.pulls.requestReviewers( {
+								owner: owner,
+								repo: repository,
+								pull_number: pullrequest.number,
+								reviewers: require( './variables' ).REVIEWERS,
+								team_reviewers: require( './variables' ).TEAM_REVIEWERS,
+							} );
 							toolkit.log.green( `Pull Request Created : #${pullrequest.number}` );
 							toolkit.log( `${pullrequest.html_url}` );
 						}
