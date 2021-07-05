@@ -9068,7 +9068,7 @@ async function run() {
 								head: pull_request_branch,
 								base: current_branch,
 							} );
-							await octokit.rest.pulls.requestReviewers( {
+							await octokit.pulls.requestReviewers( {
 								owner: owner,
 								repo: repository,
 								pull_number: pullrequest.number,
