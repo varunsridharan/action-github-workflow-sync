@@ -44,6 +44,10 @@ inputs:
     description: "Provide your own custom commit MESSAGE"
     required: false
     default: 'false'
+  ASSIGNEES:
+    description: "Add pull request assignees"
+    required: false
+    default: ''
   REVIEWERS:
     description: "Request pull request reviews"
     required: false
