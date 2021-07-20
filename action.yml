@@ -20,6 +20,10 @@ inputs:
   GITHUB_TOKEN:
     description: "Token to use to get repos and write secrets"
     required: true
+  GIT_URL:
+    description: "The URL to the Github server. Defaults to github.com. Change if using a GHES instance."
+    default: 'github.com'
+    required: false
   DRY_RUN:
     description: "Run everything except for nothing will be Updated."
     required: false
