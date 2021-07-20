@@ -19,6 +19,7 @@ This also isn't limited to Github Action yaml files - another use case could be 
 | **Argument** | Defaults | Description |
 | --- | :---: | :---: | 
 | `GITHUB_TOKEN` | - | **Required** Token to use to get repos and write secrets. `${{secrets.GITHUB_TOKEN}}` will not work. instead **Personal Access Token Required*** |
+| `GIT_URL` | github.com | URL for the instance of github, where repositories should be searched for. Change if using a GHES instance. |
 | `REPOSITORIES` | - | **Required** New line deliminated regex expressions to select repositories. Repositires are limited to those in whcich the token user is an owner or collaborator. |
 | `WORKFLOW_FILES` | - | **Required** New line deliminated regex expressions. workflow files to be copied to provided repositores |
 | `DRY_RUN` | ***false*** | Run everything except for nothing will be pushed. |
