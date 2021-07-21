@@ -10,6 +10,7 @@ async function run() {
 	let COMMIT_EACH_FILE       = require( './variables' ).COMMIT_EACH_FILE;
 	let DRY_RUN                = require( './variables' ).DRY_RUN;
 	let GITHUB_TOKEN           = require( './variables' ).GITHUB_TOKEN;
+	let GIT_URL                = require( './variables' ).GIT_URL;
 	let WORKFLOW_FILES_DIR     = require( './variables' ).WORKFLOW_FILES_DIR;
 	let WORKSPACE              = require( './variables' ).WORKSPACE;
 	let REPOSITORIES           = require( './variables' ).REPOSITORIES;

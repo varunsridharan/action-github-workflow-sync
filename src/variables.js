@@ -7,6 +7,7 @@ const DRY_RUN                = toolkit.input.tobool( core.getInput( 'DRY_RUN' ) 
 const PULL_REQUEST           = toolkit.input.tobool( core.getInput( 'PULL_REQUEST' ) );
 const SKIP_CI                = toolkit.input.tobool( core.getInput( 'SKIP_CI' ) );
 const GITHUB_TOKEN           = core.getInput( 'GITHUB_TOKEN' );
+const GIT_URL                = core.getInput( 'GIT_URL' );
 const RAW_REPOSITORIES       = core.getInput( 'REPOSITORIES' );
 const COMMIT_MESSAGE         = core.getInput( 'COMMIT_MESSAGE' );
 const RAW_WORKFLOW_FILES     = core.getInput( 'WORKFLOW_FILES' );
@@ -23,6 +24,7 @@ module.exports = {
 	COMMIT_EACH_FILE,
 	DRY_RUN,
 	GITHUB_TOKEN,
+	GIT_URL,
 	RAW_REPOSITORIES,
 	PULL_REQUEST,
 	RAW_WORKFLOW_FILES,

@@ -3,6 +3,7 @@ const toolkit = require( 'actions-js-toolkit' );
 
 const repositoryDetails = ( input_repo ) => {
 	let GIT_TOKEN = require( './variables' ).GITHUB_TOKEN;
+	let GIT_URL   = require( './variables' ).GIT_URL;
 	let WORKSPACE = require( './variables' ).WORKSPACE;
 	input_repo    = input_repo.split( '@' );
 
@@ -14,7 +15,7 @@ const repositoryDetails = ( input_repo ) => {
 	return {
 		owner: input_repo[ 0 ],
 		repository: input_repo[ 1 ],
-		git_url: `https://x-access-token:${GIT_TOKEN}@github.com/${input_repo[ 0 ]}/${input_repo[ 1 ]}.git`,
+		git_url: `https://x-access-token:${GIT_TOKEN}@${GIT_URL}/${input_repo[ 0 ]}/${input_repo[ 1 ]}.git`,
 		branch,
 		local_path: `${WORKSPACE}${input_repo[ 0 ]}/${input_repo[ 1 ]}/${branch}/`
 	};
