@@ -1,9 +1,11 @@
-const core    = require( '@actions/core' );
-const exec    = require( '@actions/exec' );
-const io      = require( '@actions/io' );
-const github  = require( '@actions/github' );
-const toolkit = require( 'actions-js-toolkit' );
-const helper  = require( './helper' );
+const core       = require( '@actions/core' );
+const exec       = require( '@actions/exec' );
+const io         = require( '@actions/io' );
+const toolkit    = require( 'actions-js-toolkit' );
+const helper     = require( './helper' );
+const octokit    = require("@octokit/core");
+const retry      = require("@octokit/plugin-retry");
+const throttling = require("@octokit/plugin-throttling");
 
 async function run() {
 	let AUTO_CREATE_NEW_BRANCH = require( './variables' ).AUTO_CREATE_NEW_BRANCH;
@@ -18,6 +20,7 @@ async function run() {
 	let PULL_REQUEST           = require( './variables' ).PULL_REQUEST;
 	let SKIP_CI                = require( './variables' ).SKIP_CI;
 	let COMMIT_MESSAGE         = require( './variables' ).COMMIT_MESSAGE;
+	let RETRY_MODE             = require( './variables' ).RETRY_MODE;
 
 	toolkit.log( '-------------------------------------------------------' );
 	toolkit.log( '⚙️ Basic Config' );
@@ -29,6 +32,7 @@ async function run() {
 	toolkit.log( `  * WORKSPACE                  : ${WORKSPACE}` );
 	toolkit.log( `  * SKIP_CI                    : ${SKIP_CI}` );
 	toolkit.log( `  * COMMIT_MESSAGE             : ${COMMIT_MESSAGE}` );
+	toolkit.log( `  * RETRY_MODE                 : ${RETRY_MODE}` );
 	toolkit.log( '-------------------------------------------------------' );
 	toolkit.log( '' );
 
@@ -39,9 +43,45 @@ async function run() {
 	await io.mkdirP( WORKSPACE );
 
 	/**
+	 * Octokit client shared between all asynchronuous action to avoid secondary rate limit on github API
+	 */
+	// instantiate basic octokit
+	var finalOctokit = new octokit.Octokit({auth: GITHUB_TOKEN})
+	// override the octokit instance with retry/throttling plugin if required
+	if (RETRY_MODE) {
+		enhancedOctokit = octokit.Octokit.plugin(retry.retry, throttling.throttling)
+		finalOctokit = new enhancedOctokit(
+			{
+				auth: GITHUB_TOKEN,
+				throttle: {
+					onRateLimit: (retryAfter, options) => {
+						toolkit.log.warn(`Request quota exhausted for request ${options.method} ${options.url}`);
+						if (options.request.retryCount === 0) {
+							// only retries once
+							toolkit.log.yellow(`Retrying after ${retryAfter} seconds!`);
+							return true;
+						}
+					},
+					onAbuseLimit: (retryAfter, options) => { // does not retry, only logs a warning
+						toolkit.log.warn(`Abuse detected for request ${options.method} ${options.url}`);
+					},
+				},
+				retry: { doNotRetry: ["429"]}
+			}
+		);
+	}
+	
+
+	/**
 	 * Loop Handler.
 	 */
-	await toolkit.asyncForEach( REPOSITORIES, async function( raw_repository ) {
+	 const asyncRepoHandling = async(octokitInstance, array, callback ) => {
+		for(let index = 0; index < array.length; index++) {
+			await callback(octokitInstance, array[index], index, array);
+		}
+	};
+
+	await asyncRepoHandling(finalOctokit, REPOSITORIES, async function(octokitInstance, raw_repository) {
 		core.startGroup( `📓 ${raw_repository}` );
 		toolkit.log.magenta( `⚙️ Repository Config` );
 		let { repository, branch, owner, git_url, local_path } = helper.repositoryDetails( raw_repository );
@@ -54,7 +94,7 @@ async function run() {
 		let modified            = [];
 		let current_branch      = false;
 		let pull_request_branch = false;
-
+	
 		if( status ) {
 
 			if( 'created' !== status ) {
@@ -64,6 +104,7 @@ async function run() {
 
 			let identity_status = await toolkit.git.identity( local_path, require( './variables' ).GIT_USER, require( './variables' ).GIT_EMAIL, true );
 			if( identity_status ) {
+
 				await toolkit.asyncForEach( WORKFLOW_FILES, async function( raw_workflow_file ) {
 					toolkit.log.cyan( `${raw_workflow_file}` );
 
@@ -126,7 +167,6 @@ async function run() {
 					toolkit.log( ' ' );
 				} );
 
-
 				if( DRY_RUN ) {
 					toolkit.log.warning( 'No Changes Are Pushed' );
 					toolkit.log( 'Git Status' );
@@ -147,16 +187,19 @@ async function run() {
 					if( modified.length > 0 ) {
 						let pushh_status = await toolkit.git.push( local_path, git_url, false, true );
 						if( false !== pushh_status && 'created' !== status && PULL_REQUEST ) {
-							const octokit             = github.getOctokit( GITHUB_TOKEN );
-							let { data: pullrequest } = await octokit.pulls.create( {
-								owner: owner,
-								repo: repository,
+							// create the pull request
+							const pull_request_resp = await octokitInstance.request(`POST /repos/${owner}/${repository}/pulls`, {
+								owner: owner, repo: repository,
 								title: `Files Sync From ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`,
 								head: pull_request_branch,
-								base: current_branch,
-							} );
-							toolkit.log.green( `Pull Request Created : #${pullrequest.number}` );
-							toolkit.log( `${pullrequest.html_url}` );
+								base: current_branch
+							}).catch((error) => {
+								toolkit.log.error(`Error on Pull Request Creation: ${error.status}: ${JSON.stringify(error.response.data)}`);
+							});
+							if (pull_request_resp) {
+								toolkit.log.green( `Pull Request Created : #${pull_request_resp.data.number}` );
+								toolkit.log( `${pull_request_resp.data.html_url}` );
+							}
 						}
 
 					} else {

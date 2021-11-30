@@ -11,6 +11,7 @@ const GIT_URL                = core.getInput( 'GIT_URL' );
 const RAW_REPOSITORIES       = core.getInput( 'REPOSITORIES' );
 const COMMIT_MESSAGE         = core.getInput( 'COMMIT_MESSAGE' );
 const RAW_WORKFLOW_FILES     = core.getInput( 'WORKFLOW_FILES' );
+const RETRY_MODE             = core.getInput( 'RETRY_MODE' );
 const WORKFLOW_FILES_DIR     = core.getInput( 'WORKFLOW_FILES_DIR' );
 const REPOSITORIES           = RAW_REPOSITORIES.split( '\n' );
 const WORKFLOW_FILES         = RAW_WORKFLOW_FILES.split( '\n' );
@@ -34,5 +35,6 @@ module.exports = {
 	WORKSPACE,
 	GITHUB_WORKSPACE,
 	SKIP_CI,
-	COMMIT_MESSAGE
+	COMMIT_MESSAGE,
+	RETRY_MODE
 };

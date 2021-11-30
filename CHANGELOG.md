@@ -6,6 +6,9 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ---
 
+## 3.2 - 01/12/2021
+* Added Option `RETRY_MODE`
+
 ## 3.1 - 11/02/2021
 * Added Option `SKIP_CI` [#6](https://github.com/varunsridharan/action-github-workflow-sync/issues/6)
 * Added Option `COMMIT_MESSAGE` to provide custom message by end user [#6](https://github.com/varunsridharan/action-github-workflow-sync/issues/6)
