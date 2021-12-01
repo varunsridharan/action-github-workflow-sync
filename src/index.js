@@ -43,8 +43,7 @@ async function run() {
 	await io.mkdirP( WORKSPACE );
 
 	/**
-	 * Octokit client is shared between all asynchronous action to avoid secondary rate limit on github API
-	 * See https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
+	 * Instantiate an Octokit client shared between all asynchronous tasks
 	 */
 	// instantiate a basic octokit with auth
 	var finalOctokit = new octokit.Octokit({auth: GITHUB_TOKEN})
@@ -76,7 +75,7 @@ async function run() {
 	/**
 	 * Loop Handler.
 	 */
-	await toolkit.asyncForEach(REPOSITORIES, async function(raw_repository) {
+	await toolkit.asyncForEach( REPOSITORIES, async function( raw_repository ) {
 		core.startGroup( `📓 ${raw_repository}` );
 		toolkit.log.magenta( `⚙️ Repository Config` );
 		let { repository, branch, owner, git_url, local_path } = helper.repositoryDetails( raw_repository );
@@ -89,7 +88,7 @@ async function run() {
 		let modified            = [];
 		let current_branch      = false;
 		let pull_request_branch = false;
-	
+
 		if( status ) {
 
 			if( 'created' !== status ) {
@@ -99,7 +98,6 @@ async function run() {
 
 			let identity_status = await toolkit.git.identity( local_path, require( './variables' ).GIT_USER, require( './variables' ).GIT_EMAIL, true );
 			if( identity_status ) {
-
 				await toolkit.asyncForEach( WORKFLOW_FILES, async function( raw_workflow_file ) {
 					toolkit.log.cyan( `${raw_workflow_file}` );
 
