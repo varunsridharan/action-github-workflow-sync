@@ -43,9 +43,10 @@ async function run() {
 	await io.mkdirP( WORKSPACE );
 
 	/**
-	 * Octokit client shared between all asynchronuous action to avoid secondary rate limit on github API
+	 * Octokit client is shared between all asynchronous action to avoid secondary rate limit on github API
+	 * See https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
 	 */
-	// instantiate basic octokit
+	// instantiate a basic octokit with auth
 	var finalOctokit = new octokit.Octokit({auth: GITHUB_TOKEN})
 	// override the octokit instance with retry/throttling plugin if required
 	if (RETRY_MODE) {
@@ -75,13 +76,7 @@ async function run() {
 	/**
 	 * Loop Handler.
 	 */
-	 const asyncRepoHandling = async(octokitInstance, array, callback ) => {
-		for(let index = 0; index < array.length; index++) {
-			await callback(octokitInstance, array[index], index, array);
-		}
-	};
-
-	await asyncRepoHandling(finalOctokit, REPOSITORIES, async function(octokitInstance, raw_repository) {
+	await toolkit.asyncForEach(REPOSITORIES, async function(raw_repository) {
 		core.startGroup( `📓 ${raw_repository}` );
 		toolkit.log.magenta( `⚙️ Repository Config` );
 		let { repository, branch, owner, git_url, local_path } = helper.repositoryDetails( raw_repository );
@@ -188,7 +183,7 @@ async function run() {
 						let pushh_status = await toolkit.git.push( local_path, git_url, false, true );
 						if( false !== pushh_status && 'created' !== status && PULL_REQUEST ) {
 							// create the pull request
-							const pull_request_resp = await octokitInstance.request(`POST /repos/${owner}/${repository}/pulls`, {
+							const pull_request_resp = await finalOctokit.request(`POST /repos/${owner}/${repository}/pulls`, {
 								owner: owner, repo: repository,
 								title: `Files Sync From ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`,
 								head: pull_request_branch,
