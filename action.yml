@@ -48,6 +48,10 @@ inputs:
     description: "Provide your own custom commit MESSAGE"
     required: false
     default: 'false'
+  RETRY_MODE:
+    description: "Enable retry and throttling octokit plugins to avoid secondary rate limits on github content creation"
+    required: false
+    default: 'true'
 
 runs:
   using: 'node12'
