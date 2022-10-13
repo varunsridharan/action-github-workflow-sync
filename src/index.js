@@ -183,7 +183,7 @@ async function run() {
 							// create the pull request
 							const pull_request_resp = await finalOctokit.request(`POST /repos/${owner}/${repository}/pulls`, {
 								owner: owner, repo: repository,
-								title: `Files Sync From ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`,
+								title: `minor CHORE Files Sync From ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`,
 								head: pull_request_branch,
 								base: current_branch
 							}).catch((error) => {
