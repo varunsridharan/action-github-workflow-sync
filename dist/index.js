@@ -10733,9 +10733,9 @@ async function run() {
 	await io.mkdirP( WORKSPACE );
 
 	/**
-	 * Octokit client shared between all asynchronuous action to avoid secondary rate limit on github API
+	 * Instantiate an Octokit client shared between all asynchronous tasks
 	 */
-	// instantiate basic octokit
+	// instantiate a basic octokit with auth
 	var finalOctokit = new octokit.Octokit({auth: GITHUB_TOKEN})
 	// override the octokit instance with retry/throttling plugin if required
 	if (RETRY_MODE) {
@@ -10765,13 +10765,7 @@ async function run() {
 	/**
 	 * Loop Handler.
 	 */
-	 const asyncRepoHandling = async(octokitInstance, array, callback ) => {
-		for(let index = 0; index < array.length; index++) {
-			await callback(octokitInstance, array[index], index, array);
-		}
-	};
-
-	await asyncRepoHandling(finalOctokit, REPOSITORIES, async function(octokitInstance, raw_repository) {
+	await toolkit.asyncForEach( REPOSITORIES, async function( raw_repository ) {
 		core.startGroup( `📓 ${raw_repository}` );
 		toolkit.log.magenta( `⚙️ Repository Config` );
 		let { repository, branch, owner, git_url, local_path } = helper.repositoryDetails( raw_repository );
@@ -10784,7 +10778,7 @@ async function run() {
 		let modified            = [];
 		let current_branch      = false;
 		let pull_request_branch = false;
-	
+
 		if( status ) {
 
 			if( 'created' !== status ) {
@@ -10794,7 +10788,6 @@ async function run() {
 
 			let identity_status = await toolkit.git.identity( local_path, __webpack_require__(3424).GIT_USER, __webpack_require__(3424).GIT_EMAIL, true );
 			if( identity_status ) {
-
 				await toolkit.asyncForEach( WORKFLOW_FILES, async function( raw_workflow_file ) {
 					toolkit.log.cyan( `${raw_workflow_file}` );
 
@@ -10878,9 +10871,9 @@ async function run() {
 						let pushh_status = await toolkit.git.push( local_path, git_url, false, true );
 						if( false !== pushh_status && 'created' !== status && PULL_REQUEST ) {
 							// create the pull request
-							const pull_request_resp = await octokitInstance.request(`POST /repos/${owner}/${repository}/pulls`, {
+							const pull_request_resp = await finalOctokit.request(`POST /repos/${owner}/${repository}/pulls`, {
 								owner: owner, repo: repository,
-								title: `Files Sync From ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`,
+								title: `minor CHORE Files Sync From ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`,
 								head: pull_request_branch,
 								base: current_branch
 							}).catch((error) => {
