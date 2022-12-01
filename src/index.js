@@ -6,27 +6,30 @@ const helper     = require( './helper' );
 const octokit    = require("@octokit/core");
 const retry      = require("@octokit/plugin-retry");
 const throttling = require("@octokit/plugin-throttling");
+const git_helper = require('./git_helper');
 
 async function run() {
-	let AUTO_CREATE_NEW_BRANCH = require( './variables' ).AUTO_CREATE_NEW_BRANCH;
-	let COMMIT_EACH_FILE       = require( './variables' ).COMMIT_EACH_FILE;
-	let DRY_RUN                = require( './variables' ).DRY_RUN;
-	let GITHUB_TOKEN           = require( './variables' ).GITHUB_TOKEN;
-	let GIT_URL                = require( './variables' ).GIT_URL;
-	let WORKFLOW_FILES_DIR     = require( './variables' ).WORKFLOW_FILES_DIR;
-	let WORKSPACE              = require( './variables' ).WORKSPACE;
-	let REPOSITORIES           = require( './variables' ).REPOSITORIES;
-	let WORKFLOW_FILES         = require( './variables' ).WORKFLOW_FILES;
-	let PULL_REQUEST           = require( './variables' ).PULL_REQUEST;
-	let SKIP_CI                = require( './variables' ).SKIP_CI;
-	let COMMIT_MESSAGE         = require( './variables' ).COMMIT_MESSAGE;
-	let RETRY_MODE             = require( './variables' ).RETRY_MODE;
+	let AUTO_CREATE_NEW_BRANCH       = require( './variables' ).AUTO_CREATE_NEW_BRANCH;
+	let COMMIT_EACH_FILE             = require( './variables' ).COMMIT_EACH_FILE;
+	let DRY_RUN                      = require( './variables' ).DRY_RUN;
+	let GITHUB_TOKEN                 = require( './variables' ).GITHUB_TOKEN;
+	let GIT_URL                      = require( './variables' ).GIT_URL;
+	let WORKFLOW_FILES_DIR           = require( './variables' ).WORKFLOW_FILES_DIR;
+	let WORKSPACE                    = require( './variables' ).WORKSPACE;
+	let REPOSITORIES                 = require( './variables' ).REPOSITORIES;
+	let WORKFLOW_FILES               = require( './variables' ).WORKFLOW_FILES;
+	let PULL_REQUEST                 = require( './variables' ).PULL_REQUEST;
+	let REUSE_PULL_REQUEST           = require( './variables' ).REUSE_PULL_REQUEST;
+	let SKIP_CI                      = require( './variables' ).SKIP_CI;
+	let COMMIT_MESSAGE               = require( './variables' ).COMMIT_MESSAGE;
+	let RETRY_MODE                   = require( './variables' ).RETRY_MODE;
 
 	toolkit.log( '-------------------------------------------------------' );
 	toolkit.log( '⚙️ Basic Config' );
 	toolkit.log( `  * AUTO_CREATE_NEW_BRANCH     : ${AUTO_CREATE_NEW_BRANCH}` );
 	toolkit.log( `  * COMMIT_EACH_FILE           : ${COMMIT_EACH_FILE}` );
 	toolkit.log( `  * PULL_REQUEST               : ${PULL_REQUEST}` );
+	toolkit.log( `  * REUSE_PULL_REQUEST         : ${REUSE_PULL_REQUEST}` );
 	toolkit.log( `  * DRY_RUN                    : ${DRY_RUN}` );
 	toolkit.log( `  * WORKFLOW_FILES_DIR         : ${WORKFLOW_FILES_DIR}` );
 	toolkit.log( `  * WORKSPACE                  : ${WORKSPACE}` );
@@ -84,6 +87,7 @@ async function run() {
 		toolkit.log( `	Git URL     : ${git_url}` );
 		toolkit.log( `	Branch      : ${branch}` );
 		toolkit.log( `	Local Path  : ${local_path}` );
+		
 		let status              = await helper.repositoryClone( git_url, local_path, branch, AUTO_CREATE_NEW_BRANCH );
 		let modified            = [];
 		let current_branch      = false;
@@ -93,7 +97,8 @@ async function run() {
 
 			if( 'created' !== status ) {
 				current_branch      = ( PULL_REQUEST ) ? await toolkit.git.currentBranch( local_path ) : false;
-				pull_request_branch = ( PULL_REQUEST ) ? await helper.createPullRequestBranch( local_path, current_branch ) : false;
+				existing_pull_request = (REUSE_PULL_REQUEST) ? await git_helper.findPullRequest() : ;
+				pull_request_branch = ( false === existing_pull_request && PULL_REQUEST ) ? await helper.createPullRequestBranch( local_path, current_branch ) : false;
 			}
 
 			let identity_status = await toolkit.git.identity( local_path, require( './variables' ).GIT_USER, require( './variables' ).GIT_EMAIL, true );
