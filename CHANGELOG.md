@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
 ---
+## 3.3 - 25/02/2023
+* Added Node.js 16 support
 
 ## 3.2 - 01/12/2021
 * Added Option `RETRY_MODE`
