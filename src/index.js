@@ -3,9 +3,10 @@ const exec       = require( '@actions/exec' );
 const io         = require( '@actions/io' );
 const toolkit    = require( 'actions-js-toolkit' );
 const helper     = require( './helper' );
-const octokit    = require("@octokit/core");
-const retry      = require("@octokit/plugin-retry");
-const throttling = require("@octokit/plugin-throttling");
+
+import { Octokit } from "@octokit/core";
+import { retry } from "@octokit/plugin-retry";
+import { throttling } from "@octokit/plugin-throttling";
 
 async function run() {
 	let AUTO_CREATE_NEW_BRANCH = require( './variables' ).AUTO_CREATE_NEW_BRANCH;
@@ -46,31 +47,40 @@ async function run() {
 	 * Instantiate an Octokit client shared between all asynchronous tasks
 	 */
 	// instantiate a basic octokit with auth
-	var finalOctokit = new octokit.Octokit({auth: GITHUB_TOKEN})
+	var finalOctokit = new Octokit({auth: GITHUB_TOKEN})
 	// override the octokit instance with retry/throttling plugin if required
 	if (RETRY_MODE) {
-		enhancedOctokit = octokit.Octokit.plugin(retry.retry, throttling.throttling)
-		finalOctokit = new enhancedOctokit(
-			{
-				auth: GITHUB_TOKEN,
-				throttle: {
-					onRateLimit: (retryAfter, options) => {
-						toolkit.log.warn(`Request quota exhausted for request ${options.method} ${options.url}`);
-						if (options.request.retryCount === 0) {
-							// only retries once
-							toolkit.log.yellow(`Retrying after ${retryAfter} seconds!`);
-							return true;
-						}
+		const enhancedOctoKit = Octokit.plugin(retry, throttling)
+			.defaults(
+				{
+					auth: GITHUB_TOKEN,
+					throttle: {
+						onRateLimit: (retryAfter, options) => {
+							toolkit.log.warn(`Request quota exhausted for request ${options.method} ${options.url}`);
+							if (options.request.retryCount === 0) {
+								// only retries once
+								toolkit.log.yellow(`Retrying after ${retryAfter} seconds!`);
+								return true;
+							}
+						},
+						onSecondaryRateLimit: (retryAfter, options) => {
+							toolkit.log.warn(`Secondary request quota exhausted for request ${options.method} ${options.url}`);
+							if (options.request.retryCount === 0) {
+								// only retries once
+								toolkit.log.yellow(`Retrying after ${retryAfter} seconds!`);
+								return true;
+							}
+						},
+						onAbuseLimit: (retryAfter, options) => { // does not retry, only logs a warning
+							toolkit.log.warn(`Abuse detected for request ${options.method} ${options.url}`);
+						},
 					},
-					onAbuseLimit: (retryAfter, options) => { // does not retry, only logs a warning
-						toolkit.log.warn(`Abuse detected for request ${options.method} ${options.url}`);
-					},
-				},
-				retry: { doNotRetry: ["429"]}
-			}
-		);
+					retry: {doNotRetry: ["429"]}
+				}
+			);
+        finalOctokit = new enhancedOctoKit();
 	}
-	
+
 
 	/**
 	 * Loop Handler.
