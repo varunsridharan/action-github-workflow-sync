@@ -27,12 +27,30 @@ This also isn't limited to Github Action yaml files - another use case could be 
 | `AUTO_CREATE_NEW_BRANCH` | ***false*** | Auto create new brach in a repository if the branch dose not exists |
 | `COMMIT_EACH_FILE` | ***false*** | if you need to keep track of each file's commit history separate then set it to true |
 | `PULL_REQUEST` | **false** | Set to `true` if you want the changes to be pushed via pull request. |
+| `PULL_REQUEST_LABELS` | - | Labels to apply to the created pull request. Separate multiple values using a comma. |
 | `SKIP_CI` | **false** | Set to `true` if you want skip all automations inside target repository. |
 | `COMMIT_MESSAGE` | **false** | You can provide your custom commit message. |
 | `RETRY_MODE` | **true** | Enable retry and throttling octokit plugins to avoid secondary rate limits on github content creation. |
 
 ### Personal Access Token Scope
-#### [Github Personal Token](https://github.com/settings/tokens/new?description=gh-workflow-sync)  <small> Is required with the below scope </small>
+
+A personal access token is required to use this action. Create either a fine-grained or classic token with the following scopes:
+
+#### [Github Personal Token (fine-grained)](https://github.com/settings/personal-access-tokens/new)
+
+For public repositories, choose `Public repositories` for the repository access.
+
+For private repositories, choose either `All repositories` or `Only select repositories` with the following permissions:
+
+| Permission    | Access         | Notes                                      |
+|---------------|----------------|--------------------------------------------|
+| Content       | Read and write |                                            |
+| Issues        | Read and write | Only required when adding labels to the PR |
+| Metadata      | Read-only      |                                            |
+| Pull requests | Read and write | Only required when creating a PR           |
+| Workflows     | Read and write |                                            |
+
+#### [Github Personal Token (classic)](https://github.com/settings/tokens/new?description=gh-workflow-sync)
 
 ![https://cdn.svarun.dev/gh/varunsridharan/action-github-workflow-sync/scope.jpg](https://cdn.svarun.dev/gh/varunsridharan/action-github-workflow-sync/scope.jpg)
 

@@ -5,6 +5,7 @@ const AUTO_CREATE_NEW_BRANCH = toolkit.input.tobool( core.getInput( 'AUTO_CREATE
 const COMMIT_EACH_FILE       = toolkit.input.tobool( core.getInput( 'COMMIT_EACH_FILE' ) );
 const DRY_RUN                = toolkit.input.tobool( core.getInput( 'DRY_RUN' ) );
 const PULL_REQUEST           = toolkit.input.tobool( core.getInput( 'PULL_REQUEST' ) );
+const PULL_REQUEST_LABELS    = core.getInput( 'PULL_REQUEST_LABELS' );
 const SKIP_CI                = toolkit.input.tobool( core.getInput( 'SKIP_CI' ) );
 const GITHUB_TOKEN           = core.getInput( 'GITHUB_TOKEN' );
 const GIT_URL                = core.getInput( 'GIT_URL' );
@@ -28,6 +29,7 @@ module.exports = {
 	GIT_URL,
 	RAW_REPOSITORIES,
 	PULL_REQUEST,
+	PULL_REQUEST_LABELS,
 	RAW_WORKFLOW_FILES,
 	WORKFLOW_FILES_DIR,
 	REPOSITORIES,

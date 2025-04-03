@@ -40,6 +40,9 @@ inputs:
     description: "Whether or not you want to do a pull request. Only works when branch name is provided. Default false"
     required: false
     default: 'false'
+  PULL_REQUEST_LABELS:
+    description: "Comma separated list of labels to add to the pull request. Default empty"
+    required: false
   SKIP_CI:
     description: "Adds [skip ci] to commit message which will avoid running github actions in targer repository"
     required: false

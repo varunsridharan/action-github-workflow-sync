@@ -19,6 +19,7 @@ async function run() {
 	let REPOSITORIES           = require( './variables' ).REPOSITORIES;
 	let WORKFLOW_FILES         = require( './variables' ).WORKFLOW_FILES;
 	let PULL_REQUEST           = require( './variables' ).PULL_REQUEST;
+	let PULL_REQUEST_LABELS     = require( './variables' ).PULL_REQUEST_LABELS;
 	let SKIP_CI                = require( './variables' ).SKIP_CI;
 	let COMMIT_MESSAGE         = require( './variables' ).COMMIT_MESSAGE;
 	let RETRY_MODE             = require( './variables' ).RETRY_MODE;
@@ -28,6 +29,7 @@ async function run() {
 	toolkit.log( `  * AUTO_CREATE_NEW_BRANCH     : ${AUTO_CREATE_NEW_BRANCH}` );
 	toolkit.log( `  * COMMIT_EACH_FILE           : ${COMMIT_EACH_FILE}` );
 	toolkit.log( `  * PULL_REQUEST               : ${PULL_REQUEST}` );
+	toolkit.log( `  * PULL_REQUEST_LABELS        : ${PULL_REQUEST_LABELS}` );
 	toolkit.log( `  * DRY_RUN                    : ${DRY_RUN}` );
 	toolkit.log( `  * WORKFLOW_FILES_DIR         : ${WORKFLOW_FILES_DIR}` );
 	toolkit.log( `  * WORKSPACE                  : ${WORKSPACE}` );
@@ -202,6 +204,14 @@ async function run() {
 							if (pull_request_resp) {
 								toolkit.log.green( `Pull Request Created : #${pull_request_resp.data.number}` );
 								toolkit.log( `${pull_request_resp.data.html_url}` );
+								if (PULL_REQUEST_LABELS) {
+									toolkit.log(`Adding labels [${PULL_REQUEST_LABELS}] to pull request`);
+									await finalOctokit.request(`POST /repos/${owner}/${repository}/issues/${pull_request_resp.data.number}/labels`, {
+										labels: PULL_REQUEST_LABELS.split(',').map(label => label.trim()),
+									}).catch((error) => {
+										toolkit.log.error(`Error on adding labels to pull request: ${error.status}: ${JSON.stringify(error.response.data)}`);
+									});
+								}
 							}
 						}
 
