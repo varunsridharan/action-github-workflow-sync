@@ -24,6 +24,14 @@ inputs:
     description: "The URL to the Github server. Defaults to github.com. Change if using a GHES instance."
     default: 'github.com'
     required: false
+  GIT_USER:
+    description: "The name of the user to use for git commits."
+    default: 'Workflow Sync Bot'
+    required: false
+  GIT_EMAIL:
+    description: "The email of the user to use for git commits."
+    default: 'githubactionbot+workflowsync@gmail.com'
+    required: false
   DRY_RUN:
     description: "Run everything except for nothing will be Updated."
     required: false

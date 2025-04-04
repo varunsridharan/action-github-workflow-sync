@@ -8,6 +8,8 @@ const PULL_REQUEST           = toolkit.input.tobool( core.getInput( 'PULL_REQUES
 const SKIP_CI                = toolkit.input.tobool( core.getInput( 'SKIP_CI' ) );
 const GITHUB_TOKEN           = core.getInput( 'GITHUB_TOKEN' );
 const GIT_URL                = core.getInput( 'GIT_URL' );
+const GIT_USER               = core.getInput( 'GIT_USER' );
+const GIT_EMAIL              = core.getInput( 'GIT_EMAIL' );
 const RAW_REPOSITORIES       = core.getInput( 'REPOSITORIES' );
 const COMMIT_MESSAGE         = core.getInput( 'COMMIT_MESSAGE' );
 const RAW_WORKFLOW_FILES     = core.getInput( 'WORKFLOW_FILES' );
@@ -19,8 +21,8 @@ const GITHUB_WORKSPACE       = toolkit.input.env( 'GITHUB_WORKSPACE' );
 const WORKSPACE              = toolkit.path.dirname( toolkit.path.dirname( GITHUB_WORKSPACE ) ) + '/workflow-sync/';
 
 module.exports = {
-	GIT_USER: 'Workflow Sync Bot',
-	GIT_EMAIL: 'githubactionbot+workflowsync@gmail.com',
+	GIT_USER,
+	GIT_EMAIL,
 	AUTO_CREATE_NEW_BRANCH,
 	COMMIT_EACH_FILE,
 	DRY_RUN,
