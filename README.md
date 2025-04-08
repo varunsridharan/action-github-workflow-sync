@@ -29,6 +29,7 @@ This also isn't limited to Github Action yaml files - another use case could be 
 | `PULL_REQUEST` | **false** | Set to `true` if you want the changes to be pushed via pull request. |
 | `SKIP_CI` | **false** | Set to `true` if you want skip all automations inside target repository. |
 | `COMMIT_MESSAGE` | **false** | You can provide your custom commit message. |
+| `COMMIT_MESSAGE_AS_PR_TITLE` | **false** | Use the commit message as the pull request title. |
 | `RETRY_MODE` | **true** | Enable retry and throttling octokit plugins to avoid secondary rate limits on github content creation. |
 
 ### Personal Access Token Scope

@@ -9,19 +9,20 @@ import { retry } from "@octokit/plugin-retry";
 import { throttling } from "@octokit/plugin-throttling";
 
 async function run() {
-	let AUTO_CREATE_NEW_BRANCH = require( './variables' ).AUTO_CREATE_NEW_BRANCH;
-	let COMMIT_EACH_FILE       = require( './variables' ).COMMIT_EACH_FILE;
-	let DRY_RUN                = require( './variables' ).DRY_RUN;
-	let GITHUB_TOKEN           = require( './variables' ).GITHUB_TOKEN;
-	let GIT_URL                = require( './variables' ).GIT_URL;
-	let WORKFLOW_FILES_DIR     = require( './variables' ).WORKFLOW_FILES_DIR;
-	let WORKSPACE              = require( './variables' ).WORKSPACE;
-	let REPOSITORIES           = require( './variables' ).REPOSITORIES;
-	let WORKFLOW_FILES         = require( './variables' ).WORKFLOW_FILES;
-	let PULL_REQUEST           = require( './variables' ).PULL_REQUEST;
-	let SKIP_CI                = require( './variables' ).SKIP_CI;
-	let COMMIT_MESSAGE         = require( './variables' ).COMMIT_MESSAGE;
-	let RETRY_MODE             = require( './variables' ).RETRY_MODE;
+	let AUTO_CREATE_NEW_BRANCH     = require( './variables' ).AUTO_CREATE_NEW_BRANCH;
+	let COMMIT_EACH_FILE           = require( './variables' ).COMMIT_EACH_FILE;
+	let DRY_RUN                    = require( './variables' ).DRY_RUN;
+	let GITHUB_TOKEN               = require( './variables' ).GITHUB_TOKEN;
+	let GIT_URL                    = require( './variables' ).GIT_URL;
+	let WORKFLOW_FILES_DIR         = require( './variables' ).WORKFLOW_FILES_DIR;
+	let WORKSPACE                  = require( './variables' ).WORKSPACE;
+	let REPOSITORIES               = require( './variables' ).REPOSITORIES;
+	let WORKFLOW_FILES             = require( './variables' ).WORKFLOW_FILES;
+	let PULL_REQUEST               = require( './variables' ).PULL_REQUEST;
+	let SKIP_CI                    = require( './variables' ).SKIP_CI;
+	let COMMIT_MESSAGE             = require( './variables' ).COMMIT_MESSAGE;
+	let COMMIT_MESSAGE_AS_PR_TITLE = require( './variables' ).COMMIT_MESSAGE_AS_PR_TITLE;
+	let RETRY_MODE                 = require( './variables' ).RETRY_MODE;
 
 	toolkit.log( '-------------------------------------------------------' );
 	toolkit.log( '⚙️ Basic Config' );
@@ -193,7 +194,7 @@ async function run() {
 							// create the pull request
 							const pull_request_resp = await finalOctokit.request(`POST /repos/${owner}/${repository}/pulls`, {
 								owner: owner, repo: repository,
-								title: `Files Sync From ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`,
+								title: ( COMMIT_MESSAGE_AS_PR_TITLE ) ? COMMIT_MESSAGE : `Files Sync From ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`,
 								head: pull_request_branch,
 								base: current_branch
 							}).catch((error) => {
