@@ -9,25 +9,28 @@ import { retry } from "@octokit/plugin-retry";
 import { throttling } from "@octokit/plugin-throttling";
 
 async function run() {
-	let AUTO_CREATE_NEW_BRANCH = require( './variables' ).AUTO_CREATE_NEW_BRANCH;
-	let COMMIT_EACH_FILE       = require( './variables' ).COMMIT_EACH_FILE;
-	let DRY_RUN                = require( './variables' ).DRY_RUN;
-	let GITHUB_TOKEN           = require( './variables' ).GITHUB_TOKEN;
-	let GIT_URL                = require( './variables' ).GIT_URL;
-	let WORKFLOW_FILES_DIR     = require( './variables' ).WORKFLOW_FILES_DIR;
-	let WORKSPACE              = require( './variables' ).WORKSPACE;
-	let REPOSITORIES           = require( './variables' ).REPOSITORIES;
-	let WORKFLOW_FILES         = require( './variables' ).WORKFLOW_FILES;
-	let PULL_REQUEST           = require( './variables' ).PULL_REQUEST;
-	let SKIP_CI                = require( './variables' ).SKIP_CI;
-	let COMMIT_MESSAGE         = require( './variables' ).COMMIT_MESSAGE;
-	let RETRY_MODE             = require( './variables' ).RETRY_MODE;
+	let AUTO_CREATE_NEW_BRANCH     = require( './variables' ).AUTO_CREATE_NEW_BRANCH;
+	let COMMIT_EACH_FILE           = require( './variables' ).COMMIT_EACH_FILE;
+	let DRY_RUN                    = require( './variables' ).DRY_RUN;
+	let GITHUB_TOKEN               = require( './variables' ).GITHUB_TOKEN;
+	let GIT_URL                    = require( './variables' ).GIT_URL;
+	let WORKFLOW_FILES_DIR         = require( './variables' ).WORKFLOW_FILES_DIR;
+	let WORKSPACE                  = require( './variables' ).WORKSPACE;
+	let REPOSITORIES               = require( './variables' ).REPOSITORIES;
+	let WORKFLOW_FILES             = require( './variables' ).WORKFLOW_FILES;
+	let PULL_REQUEST               = require( './variables' ).PULL_REQUEST;
+  let PULL_REQUEST_LABELS        = require( './variables' ).PULL_REQUEST_LABELS;
+	let SKIP_CI                    = require( './variables' ).SKIP_CI;
+	let COMMIT_MESSAGE             = require( './variables' ).COMMIT_MESSAGE;
+	let COMMIT_MESSAGE_AS_PR_TITLE = require( './variables' ).COMMIT_MESSAGE_AS_PR_TITLE;
+	let RETRY_MODE                 = require( './variables' ).RETRY_MODE;
 
 	toolkit.log( '-------------------------------------------------------' );
 	toolkit.log( '⚙️ Basic Config' );
 	toolkit.log( `  * AUTO_CREATE_NEW_BRANCH     : ${AUTO_CREATE_NEW_BRANCH}` );
 	toolkit.log( `  * COMMIT_EACH_FILE           : ${COMMIT_EACH_FILE}` );
 	toolkit.log( `  * PULL_REQUEST               : ${PULL_REQUEST}` );
+	toolkit.log( `  * PULL_REQUEST_LABELS        : ${PULL_REQUEST_LABELS}` );
 	toolkit.log( `  * DRY_RUN                    : ${DRY_RUN}` );
 	toolkit.log( `  * WORKFLOW_FILES_DIR         : ${WORKFLOW_FILES_DIR}` );
 	toolkit.log( `  * WORKSPACE                  : ${WORKSPACE}` );
@@ -193,7 +196,7 @@ async function run() {
 							// create the pull request
 							const pull_request_resp = await finalOctokit.request(`POST /repos/${owner}/${repository}/pulls`, {
 								owner: owner, repo: repository,
-								title: `Files Sync From ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`,
+								title: ( COMMIT_MESSAGE_AS_PR_TITLE ) ? COMMIT_MESSAGE : `Files Sync From ${toolkit.input.env( 'GITHUB_REPOSITORY' )}`,
 								head: pull_request_branch,
 								base: current_branch
 							}).catch((error) => {
@@ -202,6 +205,14 @@ async function run() {
 							if (pull_request_resp) {
 								toolkit.log.green( `Pull Request Created : #${pull_request_resp.data.number}` );
 								toolkit.log( `${pull_request_resp.data.html_url}` );
+								if (PULL_REQUEST_LABELS) {
+									toolkit.log(`Adding labels [${PULL_REQUEST_LABELS}] to pull request`);
+									await finalOctokit.request(`POST /repos/${owner}/${repository}/issues/${pull_request_resp.data.number}/labels`, {
+										labels: PULL_REQUEST_LABELS.split(',').map(label => label.trim()),
+									}).catch((error) => {
+										toolkit.log.error(`Error on adding labels to pull request: ${error.status}: ${JSON.stringify(error.response.data)}`);
+									});
+								}
 							}
 						}
 
