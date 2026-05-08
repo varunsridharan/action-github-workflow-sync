@@ -19,7 +19,7 @@ async function run() {
 	let REPOSITORIES           = require( './variables' ).REPOSITORIES;
 	let WORKFLOW_FILES         = require( './variables' ).WORKFLOW_FILES;
 	let PULL_REQUEST           = require( './variables' ).PULL_REQUEST;
-	let PULL_REQUEST_LABELS     = require( './variables' ).PULL_REQUEST_LABELS;
+	let PULL_REQUEST_LABELS    = require( './variables' ).PULL_REQUEST_LABELS;
 	let SKIP_CI                = require( './variables' ).SKIP_CI;
 	let COMMIT_MESSAGE         = require( './variables' ).COMMIT_MESSAGE;
 	let RETRY_MODE             = require( './variables' ).RETRY_MODE;
